@@ -100,7 +100,7 @@ bool Camera::Look(GLFWwindow *window, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         position.y += walkSpeed;
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         position.y -= walkSpeed;
 
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {

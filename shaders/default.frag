@@ -170,10 +170,11 @@ vec3 Trace(Ray ray, int MaxBounceCount, inout uint rngState) {
 
             RayTracingMaterial material = hitinfo.mat;
             vec3 emittedLight = material.emissionColor * material.emissionStrength;
+            float lightStrenght = dot(hitinfo.normal, ray.dir);
             incomingLight += emittedLight * rayColor;
-            rayColor *= material.color;
+            rayColor *= material.color * lightStrenght;
         } else {
-//            incomingLight += GetEnvironmentLight(ray) * rayColor;
+            incomingLight += GetEnvironmentLight(ray) * rayColor;
             break;
         }
     }
