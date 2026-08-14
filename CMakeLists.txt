@@ -19,6 +19,7 @@ add_subdirectory(
 add_library(glad
         libraries/glad/src/glad.c
         src/headers/cube.h
+        src/headers/camera.h
 )
 
 target_include_directories(glad PUBLIC
@@ -31,6 +32,7 @@ add_executable(raytracer
         src/headers/shaders.h
         src/shaders.cpp
         src/objects/cube.cpp
+        src/camera.cpp
 )
 
 target_link_libraries(raytracer PRIVATE

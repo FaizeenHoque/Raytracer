@@ -8,6 +8,7 @@
 
 #include <cmath>
 
+#include "headers/camera.h"
 #include "headers/shaders.h"
 #include "headers/cube.h"
 
@@ -57,25 +58,7 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    	shaderProgram.Activate();
-
-    	glm::mat4 view = glm::lookAt(
-			glm::vec3(0.0f, 1.0f, 5.0f),   // camera position
-			glm::vec3(0.0f, 0.0f, 0.0f),   // looking at origin
-			glm::vec3(0.0f, 1.0f, 0.0f)    // up vector
-		);
-
-    	glm::mat4 projection = glm::perspective(
-			glm::radians(45.0f),
-			(float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
-			0.1f,
-			100.0f
-		);
-
-    	GLuint viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
-    	GLuint projLoc = glGetUniformLocation(shaderProgram.ID, "projection");
-    	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    	Camera camera(shaderProgram, glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
     	cube1.Draw(shaderProgram);
     	cube2.Draw(shaderProgram);
@@ -84,9 +67,6 @@ int main() {
         glfwPollEvents();
     }
 
-    // glDeleteVertexArrays(1, &VAO);
-    // glDeleteBuffers(1, &VBO);
-    // glDeleteBuffers(1, &EBO);
     shaderProgram.Delete();
 
     glfwDestroyWindow(window);
