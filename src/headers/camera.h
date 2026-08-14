@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "shaders.h"
+#include "GLFW/glfw3.h"
 
 class Camera {
 public:
@@ -24,6 +25,11 @@ public:
 	// void RayTest();
 	void OnRenderImage();
 	void UpdateCameraParams();
+
+	float yaw = -90.0f;
+	float pitch = 0.0f;
+	float rotateSpeed = 60.0f;
+	void Look(GLFWwindow* window, float deltaTime);
 
 private:
 	Shader shaderProgram;

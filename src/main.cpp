@@ -54,12 +54,17 @@ int main() {
     glBindVertexArray(0);
 
     Camera camera(shaderProgram, 45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-
+	float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window)) {
+    	float currentFrame = (float)glfwGetTime();
+    	float deltaTime = currentFrame - lastFrame;
+    	lastFrame = currentFrame;
+
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        camera.OnRenderImage(); // pushes viewParams / camLocalToWorldMatrix
+        camera.OnRenderImage();
+    	camera.Look(window, deltaTime);
 
         shaderProgram.Activate();
     	glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
