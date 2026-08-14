@@ -38,6 +38,10 @@ add_executable(raytracer
         src/camera.cpp
         src/objects/sphere.cpp
         src/headers/sphere.h
+        src/renderer.cpp
+        src/headers/renderer.h
+        src/scene.cpp
+        src/headers/scene.h
 )
 
 target_link_libraries(raytracer PRIVATE

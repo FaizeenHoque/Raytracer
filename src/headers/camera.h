@@ -12,24 +12,25 @@
 
 class Camera {
 public:
-	float fov = 45.0f;
-	float aspect = 1.0f;
-	float nearPlane = 0.01f;
-	float farPlane = 100.0f;
+	float fov;
+	float aspect;
+	float nearPlane;
+	float farPlane;
+
+	float sensitivity;
+	float walkSpeed;
+	float yaw;
+	float pitch;
 
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, -20.0f);
 	glm::vec3 forward{};
 	glm::vec3 up{};
 	glm::vec3 right{};
 
-	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane);
+	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch);
 
 	void OnRenderImage();
 	void UpdateCameraParams();
-
-
-	float sensitivity = 0.1f;
-	float walkSpeed_ = 10.0f;
 	bool Look(GLFWwindow* window, float deltaTime);
 
 private:
@@ -38,8 +39,7 @@ private:
 	glm::mat4 projection{};
 	glm::mat4 view{};
 
-	float yaw = -90.0f;
-	float pitch = 0.0f;
+
 };
 
-#endif //RAYTRACER_CAMERA_H
+#endif

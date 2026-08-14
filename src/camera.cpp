@@ -3,8 +3,8 @@
 #include "headers/camera.h"
 
 
-Camera::Camera(Shader shader, float fov, float aspect, float nearPlane, float farPlane)
-	: shaderProgram(shader), fov(fov), aspect(aspect), nearPlane(nearPlane), farPlane(farPlane) {
+Camera::Camera(Shader shader, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch)
+	: shaderProgram(shader), fov(fov), aspect(aspect), nearPlane(nearPlane), farPlane(farPlane), sensitivity(sensitivity), walkSpeed(walkSpeed), yaw(yaw), pitch(pitch) {
 	shaderProgram.Activate();
 
 	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -38,7 +38,7 @@ void Camera::UpdateCameraParams() {
 }
 
 bool Camera::Look(GLFWwindow *window, float deltaTime) {
-    float walkSpeed = walkSpeed_ * deltaTime;
+    float walkSpeed_ = walkSpeed * deltaTime;
 
     glm::vec3 oldPosition = position;
     float oldYaw = yaw;
@@ -86,22 +86,22 @@ bool Camera::Look(GLFWwindow *window, float deltaTime) {
     );
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        position -= flatForward * walkSpeed;
+        position -= flatForward * walkSpeed_;
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        position += flatForward * walkSpeed;
+        position += flatForward * walkSpeed_;
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        position -= right * walkSpeed;
+        position -= right * walkSpeed_;
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        position += right * walkSpeed;
+        position += right * walkSpeed_;
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        position.y += walkSpeed;
+        position.y += walkSpeed_;
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        position.y -= walkSpeed;
+        position.y -= walkSpeed_;
 
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
         position = glm::vec3(0.0f, 0.0f, -5.0f);
