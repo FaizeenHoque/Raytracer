@@ -18,6 +18,7 @@ add_subdirectory(
 # GLAD
 add_library(glad
         libraries/glad/src/glad.c
+        src/headers/cube.h
 )
 
 target_include_directories(glad PUBLIC
@@ -26,7 +27,10 @@ target_include_directories(glad PUBLIC
 
 # Main executable
 add_executable(raytracer
-        main.cpp
+        src/main.cpp
+        src/headers/shaders.h
+        src/shaders.cpp
+        src/objects/cube.cpp
 )
 
 target_link_libraries(raytracer PRIVATE
@@ -37,4 +41,12 @@ target_link_libraries(raytracer PRIVATE
 target_include_directories(raytracer PRIVATE
         libraries/glad/include
         libraries/glfw-3.5.1/include
+        libraries/glm
+)
+
+# Copy shaders beside the executable
+add_custom_command(TARGET raytracer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/shaders
+        $<TARGET_FILE_DIR:raytracer>/shaders
 )
