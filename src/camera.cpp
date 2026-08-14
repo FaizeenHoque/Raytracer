@@ -37,8 +37,12 @@ void Camera::UpdateCameraParams() {
 	glUniform3fv(camPosLoc, 1, glm::value_ptr(position));
 }
 
-void Camera::Look(GLFWwindow *window, float deltaTime) {
+bool Camera::Look(GLFWwindow *window, float deltaTime) {
     float walkSpeed = walkSpeed_ * deltaTime;
+
+    glm::vec3 oldPosition = position;
+    float oldYaw = yaw;
+    float oldPitch = pitch;
 
     static double lastMouseX = 0.0;
     static double lastMouseY = 0.0;
@@ -110,4 +114,8 @@ void Camera::Look(GLFWwindow *window, float deltaTime) {
         position + forward,
         worldUp
     );
+
+    return position != oldPosition ||
+           yaw != oldYaw ||
+           pitch != oldPitch;
 }

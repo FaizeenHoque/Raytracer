@@ -30,7 +30,7 @@ public:
 
 	float sensitivity = 0.1f;
 	float walkSpeed_ = 10.0f;
-	void Look(GLFWwindow* window, float deltaTime);
+	bool Look(GLFWwindow* window, float deltaTime);
 
 private:
 	Shader shaderProgram;

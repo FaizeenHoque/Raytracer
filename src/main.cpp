@@ -136,69 +136,57 @@ int main() {
 
     sphereManager.Upload();
 
-    bool isRendering = false;
-    bool ePrevPressed = false;
-
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = (float)glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // toggle on E press (edge-triggered, not held)
-        bool ePressedNow = glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS;
-        if (ePressedNow && !ePrevPressed) {
-            isRendering = !isRendering;
-            if (isRendering) {
-                numRenderedFrames = 0; // start fresh accumulation each time you turn it on
-            }
-        }
-        ePrevPressed = ePressedNow;
+    	bool cameraMoved = camera.Look(window, deltaTime);
 
-        camera.OnRenderImage();
-        camera.Look(window, deltaTime);
+    	if (cameraMoved) {
+    		numRenderedFrames = 0;
+    	}
 
-        if (isRendering) {
-            int prevIndex = 1 - currentIndex;
+    	camera.OnRenderImage();
 
-            glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[currentIndex]);
-            glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        int prevIndex = 1 - currentIndex;
 
-            shaderProgram.Activate();
+        glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[currentIndex]);
+        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-            glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
-            glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
-            glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
-            glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
+        shaderProgram.Activate();
 
-            glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 1.0f, 1.0f, 1.0f);
-            glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourZenith"), 0.3f, 0.5f, 1.0f);
-            glUniform3f(glGetUniformLocation(shaderProgram.ID, "GroundColour"), 0.35f, 0.3f, 0.25f);
+        glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
 
-            glm::vec3 sunDir = glm::normalize(glm::vec3(0.3f, -0.2f, 0.5f));
-            glUniform3f(glGetUniformLocation(shaderProgram.ID, "SunLightDirection"), sunDir.x, sunDir.y, sunDir.z);
+        glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourZenith"), 0.3f, 0.5f, 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram.ID, "GroundColour"), 0.35f, 0.3f, 0.25f);
 
-            glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunFocus"), 500.0f);
-            glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunIntensity"), 10.0f);
+        glm::vec3 sunDir = glm::normalize(glm::vec3(0.3f, -0.2f, 0.5f));
+        glUniform3f(glGetUniformLocation(shaderProgram.ID, "SunLightDirection"), sunDir.x, sunDir.y, sunDir.z);
 
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, accumTex[prevIndex]);
-            glUniform1i(glGetUniformLocation(shaderProgram.ID, "PreviousFrame"), 0);
+        glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunFocus"), 500.0f);
+        glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunIntensity"), 10.0f);
 
-            glBindVertexArray(quadVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, accumTex[prevIndex]);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "PreviousFrame"), 0);
 
-            // blit accumulated result to the default framebuffer so it's visible
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, accumFBO[currentIndex]);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-            glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
-            numRenderedFrames++;
-            currentIndex = prevIndex;
-        }
-        // when isRendering is false, nothing is drawn or cleared —
-        // the last blitted frame just stays visible in the default framebuffer
+        // blit accumulated result to the default framebuffer so it's visible
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, accumFBO[currentIndex]);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        numRenderedFrames++;
+        currentIndex = prevIndex;
 
         glfwSwapBuffers(window);
         glfwPollEvents();
