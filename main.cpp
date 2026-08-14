@@ -30,12 +30,14 @@ int main() {
 
     // vertices and indices for a triangle
     GLfloat vertices[] = {
-        0.0f,          0.5f, 0.0f,
-       -0.5f,         -0.5f, 0.0f,
-        0.5f,         -0.5f, 0.0f
+        -0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+       -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
    };
     GLuint indices[] = {
-        0, 1, 2
+        0, 1, 2,
+        2, 1, 3
     };
 
     // Create window
@@ -99,7 +101,7 @@ int main() {
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
