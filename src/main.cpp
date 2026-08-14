@@ -23,7 +23,7 @@ int main() {
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Raytracer", NULL, NULL);
     glfwSetWindowSizeLimits(window, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwSetWindowSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!window) { std::cout << "Failed to create GLFW window" << std::endl; glfwTerminate(); return -1; }
 
@@ -47,88 +47,158 @@ int main() {
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
 
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+    // --- Accumulation ping-pong framebuffers ---
+    GLuint accumFBO[2], accumTex[2];
+    glGenFramebuffers(2, accumFBO);
+    glGenTextures(2, accumTex);
+
+    for (int i = 0; i < 2; i++) {
+        glBindTexture(GL_TEXTURE_2D, accumTex[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, WINDOW_WIDTH, WINDOW_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[i]);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumTex[i], 0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Accum FBO " << i << " incomplete!" << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    int currentIndex = 0;
+    int numRenderedFrames = 0;
 
     Camera camera(shaderProgram, 45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
-	SphereManager sphereManager(shaderProgram);
+    SphereManager sphereManager(shaderProgram);
 
+	// Large light source in the background
 	sphereManager.AddSphere(
 		Sphere(
-			glm::vec3(-2.0f, 0.0f, 0.0f),
-			1.0f,
-			glm::vec4(0.2f, 1.0f, 1.0f, 1.0f),
-			glm::vec3(0.0f),
-			0.0f
-		)
-	);
-
-	// sphereManager.AddSphere(
-	// 	Sphere(
-	// 		glm::vec3(0.0f, 0.0f, 0.0f),
-	// 		0.5f,
-	// 		glm::vec4(0.8f, 1.0f, 0.0f, 1.0f),
-	// 		glm::vec3(1.0f),
-	// 		1.0f
-	// 	)
-	// );
-
-	sphereManager.AddSphere(
-		Sphere(
-			glm::vec3(2.0f, 0.0f, 0.0f),
-			1.0f,
-			glm::vec4(0.2f, 1.0f, 0.3f, 1.0f),
-			glm::vec3(0.0f),
-			0.0f
-		)
-	);
-
-	sphereManager.AddSphere(
-		Sphere(
-			glm::vec3(0.0f, 0.0f, 2.0f),
-			1.0f,
-			glm::vec4(0.8f, 1.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 3.0f, 8.0f),
+			3.0f,
+			glm::vec4(1.0f, 0.85f, 0.95f, 1.0f),
 			glm::vec3(1.0f),
-			0.0f
+			8.0f
 		)
 	);
 
-	sphereManager.Upload();
+    // Large light-purple ground sphere
+    sphereManager.AddSphere(
+        Sphere(
+            glm::vec3(0.0f, -5.0f, 0.0f),
+            5.0f,
+            glm::vec4(0.65f, 0.45f, 0.9f, 1.0f),
+            glm::vec3(0.0f),
+            0.0f
+        )
+    );
 
-	float lastFrame = 0.0f;
+    // Small spheres
+    sphereManager.AddSphere(
+        Sphere(
+            glm::vec3(-2.0f, 0.0f, 0.0f),
+            1.0f,
+            glm::vec4(0.2f, 1.0f, 1.0f, 1.0f),
+            glm::vec3(0.0f),
+            0.0f
+        )
+    );
+
+    sphereManager.AddSphere(
+        Sphere(
+            glm::vec3(2.0f, 0.0f, 0.0f),
+            1.0f,
+            glm::vec4(0.2f, 1.0f, 0.3f, 1.0f),
+            glm::vec3(0.0f),
+            0.0f
+        )
+    );
+
+    sphereManager.AddSphere(
+        Sphere(
+            glm::vec3(0.0f, 0.0f, 2.0f),
+            1.0f,
+            glm::vec4(0.8f, 1.0f, 0.0f, 1.0f),
+            glm::vec3(1.0f),
+            0.0f
+        )
+    );
+
+    sphereManager.Upload();
+
+    bool isRendering = false;
+    bool ePrevPressed = false;
+
+    float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window)) {
-    	float currentFrame = (float)glfwGetTime();
-    	float deltaTime = currentFrame - lastFrame;
-    	lastFrame = currentFrame;
+        float currentFrame = (float)glfwGetTime();
+        float deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // toggle on E press (edge-triggered, not held)
+        bool ePressedNow = glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS;
+        if (ePressedNow && !ePrevPressed) {
+            isRendering = !isRendering;
+            if (isRendering) {
+                numRenderedFrames = 0; // start fresh accumulation each time you turn it on
+            }
+        }
+        ePrevPressed = ePressedNow;
 
         camera.OnRenderImage();
-    	camera.Look(window, deltaTime);
+        camera.Look(window, deltaTime);
 
-        shaderProgram.Activate();
+        if (isRendering) {
+            int prevIndex = 1 - currentIndex;
 
-    	glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
-    	glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
-    	glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
-    	glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 1.0f, 1.0f, 1.0f);
-    	glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourZenith"), 0.3f, 0.5f, 1.0f);
-    	glUniform3f(glGetUniformLocation(shaderProgram.ID, "GroundColour"), 0.35f, 0.3f, 0.25f);
+            glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[currentIndex]);
+            glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    	glm::vec3 sunDir = glm::normalize(glm::vec3(0.3f, -0.6f, 0.5f));
-    	glUniform3f(glGetUniformLocation(shaderProgram.ID, "SunLightDirection"), sunDir.x, sunDir.y, sunDir.z);
+            shaderProgram.Activate();
 
-    	glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunFocus"), 500.0f);
-    	glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunIntensity"), 10.0f);
+            glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
+            glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
+            glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
+            glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
 
-        glBindVertexArray(quadVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+            glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 1.0f, 1.0f, 1.0f);
+            glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourZenith"), 0.3f, 0.5f, 1.0f);
+            glUniform3f(glGetUniformLocation(shaderProgram.ID, "GroundColour"), 0.35f, 0.3f, 0.25f);
+
+            glm::vec3 sunDir = glm::normalize(glm::vec3(0.3f, -0.2f, 0.5f));
+            glUniform3f(glGetUniformLocation(shaderProgram.ID, "SunLightDirection"), sunDir.x, sunDir.y, sunDir.z);
+
+            glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunFocus"), 500.0f);
+            glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunIntensity"), 10.0f);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, accumTex[prevIndex]);
+            glUniform1i(glGetUniformLocation(shaderProgram.ID, "PreviousFrame"), 0);
+
+            glBindVertexArray(quadVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
+            // blit accumulated result to the default framebuffer so it's visible
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, accumFBO[currentIndex]);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            numRenderedFrames++;
+            currentIndex = prevIndex;
+        }
+        // when isRendering is false, nothing is drawn or cleared —
+        // the last blitted frame just stays visible in the default framebuffer
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -137,6 +207,8 @@ int main() {
     shaderProgram.Delete();
     glDeleteVertexArrays(1, &quadVAO);
     glDeleteBuffers(1, &quadVBO);
+    glDeleteFramebuffers(2, accumFBO);
+    glDeleteTextures(2, accumTex);
 
     glfwDestroyWindow(window);
     glfwTerminate();

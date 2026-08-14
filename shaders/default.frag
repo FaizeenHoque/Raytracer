@@ -15,6 +15,8 @@ uniform vec3 GroundColour;
 uniform vec3 SunLightDirection;
 uniform float SunFocus;
 uniform float SunIntensity;
+uniform sampler2D PreviousFrame;
+uniform int NumRenderedFrames;
 
 struct Ray {
     vec3 origin;
@@ -78,7 +80,7 @@ layout(std140) uniform SphereBuffer {
     Sphere spheres[100];
 };
 
-uniform int numSpheres = 4;
+uniform int numSpheres = 5;
 
 HitInfo CalculateRayCollision(Ray ray)
 {
@@ -171,7 +173,7 @@ vec3 Trace(Ray ray, int MaxBounceCount, inout uint rngState) {
             incomingLight += emittedLight * rayColor;
             rayColor *= material.color;
         } else {
-            incomingLight += GetEnvironmentLight(ray) * rayColor;
+//            incomingLight += GetEnvironmentLight(ray) * rayColor;
             break;
         }
     }
@@ -185,7 +187,7 @@ void main()
     uvec2 numPixels = uvec2(screenSize);
     uvec2 pixelCoord = uvec2(uv * screenSize);
     uint pixelIndex = pixelCoord.y * numPixels.x + pixelCoord.x;
-    uint rngState = pixelIndex;
+    uint rngState = pixelIndex + uint(NumRenderedFrames) * 1129u;
 
     // Create ray
     vec3 viewPointLocal = vec3(uv - 0.5, 1.0) * viewParams;
@@ -202,6 +204,11 @@ void main()
         totalIncomingLight += Trace(ray, MaxBounceCount, rngState);
     }
 
-    vec3 pixelCol = totalIncomingLight / NumRaysPerPixel;
-    FragColor = vec4(pixelCol, 1.0);
+    vec3 pixelCol = totalIncomingLight / float(NumRaysPerPixel);
+
+    vec3 previousCol = texture(PreviousFrame, uv).rgb;
+    float weight = 1.0 / float(NumRenderedFrames + 1);
+    vec3 accumulatedCol = previousCol * (1.0 - weight) + pixelCol * weight;
+
+    FragColor = vec4(accumulatedCol, 1.0);
 }

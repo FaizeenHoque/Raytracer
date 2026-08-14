@@ -17,7 +17,7 @@ public:
 	float nearPlane = 0.01f;
 	float farPlane = 100.0f;
 
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, -5.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, -20.0f);
 	glm::vec3 forward{};
 	glm::vec3 up{};
 	glm::vec3 right{};
