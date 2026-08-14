@@ -21,9 +21,12 @@ public:
 	glm::vec3 right{};
 
 	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane);
-	void RayTest() const;
+	// void RayTest();
+	void OnRenderImage();
+	void UpdateCameraParams();
 
 private:
+	Shader shaderProgram;
 	glm::vec2 debugPointCount = glm::vec2(30.0f, 30.0f);
 	glm::mat4 projection{};
 	glm::mat4 view{};

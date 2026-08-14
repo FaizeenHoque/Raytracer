@@ -1,32 +1,16 @@
-//
-// Created by fynr1x on 8/14/26.
-//
-
 #ifndef RAYTRACER_OBJECTS_H
 #define RAYTRACER_OBJECTS_H
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 
-class Shader;
-
-class Cube
-{
-private:
-	GLuint VAO;
-	GLuint VBO;
-	GLuint EBO;
-
-
+class Cube {
 public:
-	glm::vec3 rotation;
 	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 size;
+	glm::vec3 color;
 
-	Cube(const glm::vec3& position, const glm::vec3& rotation);
-
-	void Draw(Shader& shader);
-
-	~Cube();
+	Cube(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& size, const glm::vec3& color);
 };
 
-#endif //RAYTRACER_OBJECTS_H
+#endif

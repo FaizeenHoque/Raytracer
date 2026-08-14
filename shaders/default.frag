@@ -1,9 +1,9 @@
 #version 330 core
-
-in vec3 vertexColor;
 out vec4 FragColor;
 
-void main()
-{
-    FragColor = vec4(vertexColor, 1.0f);
+uniform vec2 screenSize;
+
+void main() {
+    float x = gl_FragCoord.y / screenSize.y;
+    FragColor = vec4(x, x, x, 1.0f);
 }
