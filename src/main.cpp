@@ -72,6 +72,12 @@ int main() {
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "Accum FBO " << i << " incomplete!" << std::endl;
     }
+	for (int i = 0; i < 2; i++) {
+		glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[i]);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     int currentIndex = 0;
@@ -88,7 +94,7 @@ int main() {
 			3.0f,
 			glm::vec4(1.0f, 0.85f, 0.95f, 1.0f),
 			glm::vec3(1.0f),
-			8.0f
+			10.0f
 		)
 	);
 
@@ -118,7 +124,7 @@ int main() {
         Sphere(
             glm::vec3(2.0f, 0.0f, 0.0f),
             1.0f,
-            glm::vec4(0.2f, 1.0f, 0.3f, 1.0f),
+            glm::vec4(1.0f),
             glm::vec3(0.0f),
             0.0f
         )
@@ -146,6 +152,13 @@ int main() {
 
     	if (cameraMoved) {
     		numRenderedFrames = 0;
+
+    		for (int i = 0; i < 2; i++) {
+    			glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[i]);
+    			glClear(GL_COLOR_BUFFER_BIT);
+    		}
+
+    		glBindFramebuffer(GL_FRAMEBUFFER, 0);
     	}
 
     	camera.OnRenderImage();
@@ -158,8 +171,9 @@ int main() {
         shaderProgram.Activate();
 
         glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
-        glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
-        glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 8);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 2);
+
         glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
 
         glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 1.0f, 1.0f, 1.0f);

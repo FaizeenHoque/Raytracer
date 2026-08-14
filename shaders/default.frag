@@ -162,19 +162,19 @@ vec3 Trace(Ray ray, int MaxBounceCount, inout uint rngState) {
     vec3 incomingLight = vec3(0.0);
     vec3 rayColor = vec3(1.0);
 
-    for (int i = 0; i <= MaxBounceCount; i++) {
+    for (int i = 0; i < MaxBounceCount; i++) {
         HitInfo hitinfo = CalculateRayCollision(ray);
         if (hitinfo.didHit) {
-            ray.origin = hitinfo.hitPoint;
+            ray.origin = hitinfo.hitPoint + hitinfo.normal * 0.001;
             ray.dir = RandomHemisphereDirection(hitinfo.normal, rngState);
 
             RayTracingMaterial material = hitinfo.mat;
             vec3 emittedLight = material.emissionColor * material.emissionStrength;
-            float lightStrenght = dot(hitinfo.normal, ray.dir);
+            float lightStrength = dot(hitinfo.normal, ray.dir);
             incomingLight += emittedLight * rayColor;
-            rayColor *= material.color * lightStrenght;
+            rayColor *= material.color * lightStrength;
         } else {
-            incomingLight += GetEnvironmentLight(ray) * rayColor;
+//            incomingLight += GetEnvironmentLight(ray) * rayColor;
             break;
         }
     }
