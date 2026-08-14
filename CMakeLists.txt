@@ -46,9 +46,9 @@ target_include_directories(raytracer PRIVATE
         libraries/glm
 )
 
-# Copy shaders beside the executable
-add_custom_command(TARGET raytracer POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/shaders
-        $<TARGET_FILE_DIR:raytracer>/shaders
-)
+## Copy shaders beside the executable
+#add_custom_command(TARGET raytracer POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        ${CMAKE_SOURCE_DIR}/shaders
+#        $<TARGET_FILE_DIR:raytracer>/shaders
+#)

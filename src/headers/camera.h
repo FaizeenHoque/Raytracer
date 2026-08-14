@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 #include <cmath>
 
 #include "shaders.h"
@@ -16,7 +17,7 @@ public:
 	float nearPlane = 0.01f;
 	float farPlane = 100.0f;
 
-	glm::vec3 position = glm::vec3(0.0f, 1.0f, 5.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, -5.0f);
 	glm::vec3 forward{};
 	glm::vec3 up{};
 	glm::vec3 right{};

@@ -29,7 +29,7 @@ int main() {
     gladLoadGL();
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Shader shaderProgram("./shaders/default.vert", "./shaders/default.frag");
+    Shader shaderProgram("../shaders/default.vert", "../shaders/default.frag");
 
     // Fullscreen quad (NDC space, no indices needed)
     float quadVertices[] = {
@@ -46,14 +46,19 @@ int main() {
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
 
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
 
     Camera camera(shaderProgram, 45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+	GLint boundVAO;
+	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &boundVAO);
+	std::cout << "quadVAO = " << quadVAO << ", currently bound = " << boundVAO << std::endl;
+
 	float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window)) {
     	float currentFrame = (float)glfwGetTime();

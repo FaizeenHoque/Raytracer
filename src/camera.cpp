@@ -35,6 +35,8 @@ void Camera::UpdateCameraParams() {
 
 	const GLuint camPosLoc = glGetUniformLocation(shaderProgram.ID, "worldSpaceCameraPos");
 	glUniform3fv(camPosLoc, 1, glm::value_ptr(position));
+
+	std::cout << "viewParamsLoc=" << viewParamsLoc << " camMatLoc=" << camMatLoc << " camPosLoc=" << camPosLoc << std::endl;
 }
 
 void Camera::Look(GLFWwindow *window, float deltaTime) {
