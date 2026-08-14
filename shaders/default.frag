@@ -30,12 +30,7 @@ struct Sphere {
     RayTracingMaterial material;
 };
 
-HitInfo RaySphere(
-        Ray ray,
-        vec3 sphereCentre,
-        float sphereRadius,
-        RayTracingMaterial material
-) {
+HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius, RayTracingMaterial material) {
     HitInfo hitInfo;
 
     hitInfo.didHit = false;
@@ -69,7 +64,7 @@ HitInfo RaySphere(
 }
 
 layout(std140) uniform SphereBuffer {
-    Sphere spheres[3];
+    Sphere spheres[100];
 };
 
 uniform int numSpheres = 3;
@@ -84,8 +79,7 @@ HitInfo CalculateRayCollision(Ray ray)
     closestHit.normal = vec3(0.0);
     closestHit.mat.color = vec4(0.0);
 
-    for (int i = 0; i < numSpheres; i++)
-    {
+    for (int i = 0; i < numSpheres; i++) {
         Sphere sphere = spheres[i];
 
         HitInfo hitInfo = RaySphere(
@@ -95,8 +89,7 @@ HitInfo CalculateRayCollision(Ray ray)
                 sphere.material
         );
 
-        if (hitInfo.didHit && hitInfo.dst < closestHit.dst)
-        {
+        if (hitInfo.didHit && hitInfo.dst < closestHit.dst) {
             closestHit = hitInfo;
         }
     }
@@ -118,15 +111,11 @@ void main()
     ray.origin = worldSpaceCameraPos;
     ray.dir = normalize(viewPoint.xyz - ray.origin);
 
-    // IMPORTANT: use the sphere buffer here.
     HitInfo hit = CalculateRayCollision(ray);
 
-    if (hit.didHit)
-    {
+    if (hit.didHit) {
         FragColor = hit.mat.color;
-    }
-    else
-    {
+    } else {
         FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
 }
