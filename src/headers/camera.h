@@ -23,13 +23,13 @@ public:
 	glm::vec3 right{};
 
 	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane);
-	// void RayTest();
+
 	void OnRenderImage();
 	void UpdateCameraParams();
 
-	float yaw = -90.0f;
-	float pitch = 0.0f;
-	float rotateSpeed = 60.0f;
+
+	float sensitivity = 0.1f;
+	float walkSpeed_ = 10.0f;
 	void Look(GLFWwindow* window, float deltaTime);
 
 private:
@@ -37,6 +37,9 @@ private:
 	glm::vec2 debugPointCount = glm::vec2(30.0f, 30.0f);
 	glm::mat4 projection{};
 	glm::mat4 view{};
+
+	float yaw = -90.0f;
+	float pitch = 0.0f;
 };
 
 #endif //RAYTRACER_CAMERA_H

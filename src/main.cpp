@@ -8,6 +8,7 @@
 #include "headers/camera.h"
 #include "headers/shaders.h"
 #include "headers/cube.h"
+#include "headers/sphere.h"
 
 #define WINDOW_WIDTH 1600
 #define WINDOW_HEIGHT 900
@@ -22,6 +23,7 @@ int main() {
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Raytracer", NULL, NULL);
     glfwSetWindowSizeLimits(window, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwSetWindowSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!window) { std::cout << "Failed to create GLFW window" << std::endl; glfwTerminate(); return -1; }
 
@@ -31,7 +33,6 @@ int main() {
 
     Shader shaderProgram("../shaders/default.vert", "../shaders/default.frag");
 
-    // Fullscreen quad (NDC space, no indices needed)
     float quadVertices[] = {
         -1.0f,  1.0f,
         -1.0f, -1.0f,
@@ -55,9 +56,33 @@ int main() {
 
     Camera camera(shaderProgram, 45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
-	GLint boundVAO;
-	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &boundVAO);
-	std::cout << "quadVAO = " << quadVAO << ", currently bound = " << boundVAO << std::endl;
+	SphereManager sphereManager(shaderProgram);
+
+	sphereManager.AddSphere(
+		Sphere(
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			1.0f,
+			glm::vec4(1.0f)
+		)
+	);
+
+	sphereManager.AddSphere(
+		Sphere(
+			glm::vec3(2.5f, 0.0f, -1.0f),
+			0.75f,
+			glm::vec4(1.0f, 0.2f, 0.2f, 1.0f)
+		)
+	);
+
+	sphereManager.AddSphere(
+		Sphere(
+			glm::vec3(-2.5f, 0.5f, 1.0f),
+			0.5f,
+			glm::vec4(0.2f, 0.4f, 1.0f, 1.0f)
+		)
+	);
+
+	sphereManager.Upload();
 
 	float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window)) {
@@ -72,6 +97,7 @@ int main() {
     	camera.Look(window, deltaTime);
 
         shaderProgram.Activate();
+
     	glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 
         glBindVertexArray(quadVAO);
