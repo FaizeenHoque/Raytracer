@@ -1,27 +1,35 @@
 #ifndef RAYTRACER_SPHERE_H
 #define RAYTRACER_SPHERE_H
 
+#include <vector>
+
 #include <glm/glm.hpp>
 
 #include "shaders.h"
 #include "glad/glad.h"
 
 struct SphereGPU {
-	glm::vec3 position;
-	float radius;
+	glm::vec4 positionRadius;
 	glm::vec4 color;
-}; static_assert( sizeof(SphereGPU) == 32, "SphereGPU must match std140 layout" );
+	glm::vec4 emission;
+};
 
 class Sphere {
 public:
 	glm::vec3 position;
 	float radius;
+
 	glm::vec4 color;
+
+	glm::vec3 emissionColor;
+	float emissionStrength;
 
 	Sphere(
 		const glm::vec3& position,
 		float radius,
-		const glm::vec4& color
+		const glm::vec4& color,
+		const glm::vec3& emissionColor,
+		float emissionStrength
 	);
 };
 
@@ -34,7 +42,6 @@ public:
 	void Upload() const;
 
 private:
-
 	void BindToShader(Shader& shader);
 
 	std::vector<Sphere> spheres;
@@ -44,5 +51,4 @@ private:
 	static constexpr GLuint SPHERE_BUFFER_BINDING = 0;
 };
 
-
-#endif //RAYTRACER_SPHERE_H
+#endif // RAYTRACER_SPHERE_H
