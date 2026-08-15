@@ -8,6 +8,8 @@ struct RayTracingMaterial {
     vec3 emissionColor;
     float emissionStrength;
     float smoothness;
+    float specularProbability;
+    vec3 specularColor;
 };
 
 struct HitInfo {

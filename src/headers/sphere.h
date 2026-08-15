@@ -14,6 +14,9 @@ struct SphereGPU {
 	MaterialGPU material;
 };
 
+static_assert(sizeof(SphereGPU) == 80, "SphereGPU must match the std140 sphere stride");
+static_assert(offsetof(SphereGPU, material) == 16);
+
 class Sphere {
 public:
 	glm::vec3 position;
@@ -22,6 +25,8 @@ public:
 	glm::vec3 emissionColor;
 	float emissionStrength;
 	float smoothness;
+	glm::vec3 specularColor;
+	float specularProbability;
 
 	Sphere(
 		const glm::vec3& position,
@@ -29,7 +34,9 @@ public:
 		const glm::vec4& color,
 		const glm::vec3& emissionColor,
 		float emissionStrength,
-		float smoothness
+		float smoothness,
+		float specularProbability,
+		const glm::vec3& specularColor
 	);
 };
 

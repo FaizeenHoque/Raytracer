@@ -47,11 +47,12 @@ vec3 Trace(Ray ray, inout uint rngState) {
             ray.origin = hitinfo.hitPoint + hitinfo.normal * RAY_ORIGIN_EPSILON;
             vec3 diffuseDir = normalize(hitinfo.normal + RandomDirection(rngState));
             vec3 specularDir = reflect(ray.dir, hitinfo.normal);
-            ray.dir = mix(diffuseDir, specularDir, material.smoothness);
+            bool isSpecularBounce = material.specularProbability >= RandomValue(rngState);
+            ray.dir = mix(diffuseDir, specularDir, material.smoothness * float(isSpecularBounce));
 
             vec3 emittedLight = material.emissionColor * material.emissionStrength;
             incomingLight += emittedLight * rayColor;
-            rayColor *= material.color;
+            rayColor *= mix(material.color, material.specularColor, isSpecularBounce);
 
             // The room keeps rays inside the triangle geometry, so nearly every
             // pixel otherwise performs all 50 bounces.  Russian roulette keeps

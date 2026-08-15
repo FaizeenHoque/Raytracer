@@ -8,14 +8,18 @@ Sphere::Sphere(
 	const glm::vec4& color,
 	const glm::vec3& emissionColor,
 	float emissionStrength,
-	float smoothness
+	float smoothness,
+	float specularProbability,
+	const glm::vec3& specularColor
 )
 	: position(position),
 	  radius(radius),
 	  color(color),
 	  emissionColor(emissionColor),
 	  emissionStrength(emissionStrength),
-	  smoothness(smoothness)
+	  smoothness(smoothness),
+	  specularProbability(specularProbability),
+      specularColor(specularColor)
 {
 }
 
@@ -48,7 +52,11 @@ void SphereManager::Upload() const
 				0.0f,
 				sphere.emissionColor,
 				sphere.emissionStrength,
-				sphere.smoothness
+				sphere.smoothness,
+				sphere.specularProbability,
+				0.0f,
+				0.0f,
+				sphere.specularColor
 			}
 		});
 	}

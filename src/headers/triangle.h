@@ -17,6 +17,9 @@ struct TriangleGPU {
 	MaterialGPU material;
 };
 
+static_assert(sizeof(TriangleGPU) == 160, "TriangleGPU must match the std140 triangle stride");
+static_assert(offsetof(TriangleGPU, material) == 96);
+
 class Triangle {
 public:
 	glm::vec3 posA;
@@ -31,6 +34,8 @@ public:
 	glm::vec3 emissionColor;
 	float emissionStrength;
 	float smoothness;
+	float specularProbability;
+	glm::vec3 specularColor;
 
 	Triangle(
 		glm::vec3 posA,
@@ -42,7 +47,9 @@ public:
 		glm::vec4 color,
 		glm::vec3 emissionColor,
 		float emissionStrength,
-		float smoothness = 0.0f
+		float smoothness = 0.0f,
+		float specularProbability = 0.0f,
+		glm::vec3 specularColor = glm::vec3(1.0f, 1.0f, 1.0f)
 	);
 };
 

@@ -12,7 +12,9 @@ Triangle::Triangle(
 	glm::vec4 color,
 	glm::vec3 emissionColor,
 	float emissionStrength,
-	float smoothness
+	float smoothness,
+	float specularProbability,
+	glm::vec3 specularColor
 )
 	: posA(posA),
 	  posB(posB),
@@ -23,7 +25,9 @@ Triangle::Triangle(
 	  color(color),
 	  emissionColor(emissionColor),
 	  emissionStrength(emissionStrength),
-      smoothness(smoothness) {
+      smoothness(smoothness),
+	  specularProbability(specularProbability),
+      specularColor(specularColor){
 }
 
 TriangleManager::TriangleManager(Shader &shader) {
@@ -57,6 +61,10 @@ void TriangleManager::Upload() const {
 				triangle.emissionColor,
 				triangle.emissionStrength,
 				triangle.smoothness,
+				triangle.specularProbability,
+				0.0f,
+				0.0f,
+				triangle.specularColor
 			}
 		});
 	}

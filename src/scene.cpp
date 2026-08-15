@@ -35,8 +35,10 @@ void Scene::Setup() {
 	glm::vec4 greenColor(0.08f, 0.70f, 0.05f, 1.0f);
 	glm::vec4 floorLightColor(0.78f, 0.78f, 0.74f, 1.0f);
 	glm::vec4 floorDarkColor(0.04f, 0.04f, 0.04f, 1.0f);
-	glm::vec4 sphereColor(0.12f, 0.42f, 0.68f, 1.0f);
+
 	glm::vec3 noEmission(0.0f);
+	const float matteSpecularProbability = 0.15f;
+	const glm::vec3 matteSpecularColor(1.0f);
 
 	// Left wall (red)
 	triangleManager.AddTriangle(Triangle(
@@ -156,8 +158,8 @@ void Scene::Setup() {
 	glm::vec3 lightMax(1.35f, roomMax.y - 0.01f, -4.8f);
 	glm::vec4 lightColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightEmission(1.0f, 1.0f, 0.9f);
-	float lightStrength = 50.0f;
-	float yOffset = 0.1f;
+	float lightStrength = 60.0f;
+	float yOffset = 0.01f;
 
 	float lightBottomY = lightMin.y - yOffset;
 
@@ -304,19 +306,23 @@ void Scene::Setup() {
 			n_bottom, n_bottom, n_bottom, boxColor, noEmission, 0.0f));
 	};
 
+	glm::vec4 sphereColor(1.0f, 0.0f, 0.0f, 1.0f);
+
 	// Four matte blue spheres across the center of the room.
 	const float sphereRadius = 1.05f;
 	const float sphereSmoothness = 1.0f;
 	const float sphereY = 3.0f;
 	const float sphereZ = -5.2f;
-	for (float x : {-3.1f, -1.05f, 1.05f, 3.1f}) {
+	for (float x : {0.0f}) {//-3.1f, -1.05f, 1.05f, 3.1f
 		sphereManager.AddSphere(Sphere(
 			glm::vec3(x, sphereY, sphereZ),
 			sphereRadius,
-			whiteColor,
+			sphereColor,
 			noEmission,
 			0.0f,
-			sphereSmoothness
+			sphereSmoothness,
+			matteSpecularProbability,
+			matteSpecularColor
 		));
 	}
 
