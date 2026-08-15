@@ -11,7 +11,8 @@ Triangle::Triangle(
 	glm::vec3 normalC,
 	glm::vec4 color,
 	glm::vec3 emissionColor,
-	float emissionStrength
+	float emissionStrength,
+	float smoothness
 )
 	: posA(posA),
 	  posB(posB),
@@ -21,7 +22,8 @@ Triangle::Triangle(
 	  normalC(normalC),
 	  color(color),
 	  emissionColor(emissionColor),
-	  emissionStrength(emissionStrength) {
+	  emissionStrength(emissionStrength),
+      smoothness(smoothness) {
 }
 
 TriangleManager::TriangleManager(Shader &shader) {
@@ -53,7 +55,8 @@ void TriangleManager::Upload() const {
 			MaterialGPU{
 				triangle.color,             0.0f,
 				triangle.emissionColor,
-				triangle.emissionStrength
+				triangle.emissionStrength,
+				triangle.smoothness,
 			}
 		});
 	}

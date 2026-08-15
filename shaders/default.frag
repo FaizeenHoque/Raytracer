@@ -41,12 +41,14 @@ vec3 Trace(Ray ray, inout uint rngState) {
 
     for (int i = 0; i <= MaxBounceCount; i++) {
         HitInfo hitinfo = CalculateRayCollision(ray);
+        RayTracingMaterial material = hitinfo.mat;
 
         if (hitinfo.didHit) {
             ray.origin = hitinfo.hitPoint + hitinfo.normal * RAY_ORIGIN_EPSILON;
-            ray.dir = normalize(hitinfo.normal + RandomDirection(rngState));
+            vec3 diffuseDir = normalize(hitinfo.normal + RandomDirection(rngState));
+            vec3 specularDir = reflect(ray.dir, hitinfo.normal);
+            ray.dir = mix(diffuseDir, specularDir, material.smoothness);
 
-            RayTracingMaterial material = hitinfo.mat;
             vec3 emittedLight = material.emissionColor * material.emissionStrength;
             incomingLight += emittedLight * rayColor;
             rayColor *= material.color;

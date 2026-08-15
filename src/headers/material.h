@@ -7,5 +7,10 @@ struct MaterialGPU {
 	float _pad0;
 	glm::vec3 emission;
 	float emissionStrength;
+	float smoothness;
+	float _pad1 = 0.0f;
+	float _pad2 = 0.0f;
+	float _pad3 = 0.0f;
 };
+
 #endif //RAYTRACER_MATERIAL_H

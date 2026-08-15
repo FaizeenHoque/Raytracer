@@ -7,13 +7,15 @@ Sphere::Sphere(
 	float radius,
 	const glm::vec4& color,
 	const glm::vec3& emissionColor,
-	float emissionStrength
+	float emissionStrength,
+	float smoothness
 )
 	: position(position),
 	  radius(radius),
 	  color(color),
 	  emissionColor(emissionColor),
-	  emissionStrength(emissionStrength)
+	  emissionStrength(emissionStrength),
+	  smoothness(smoothness)
 {
 }
 
@@ -46,6 +48,7 @@ void SphereManager::Upload() const
 				0.0f,
 				sphere.emissionColor,
 				sphere.emissionStrength,
+				sphere.smoothness
 			}
 		});
 	}

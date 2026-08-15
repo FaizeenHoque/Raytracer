@@ -30,6 +30,7 @@ public:
 	glm::vec4 color;
 	glm::vec3 emissionColor;
 	float emissionStrength;
+	float smoothness;
 
 	Triangle(
 		glm::vec3 posA,
@@ -40,7 +41,8 @@ public:
 		glm::vec3 normalC,
 		glm::vec4 color,
 		glm::vec3 emissionColor,
-		float emissionStrength
+		float emissionStrength,
+		float smoothness = 0.0f
 	);
 };
 

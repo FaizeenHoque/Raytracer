@@ -7,6 +7,7 @@ struct RayTracingMaterial {
     vec3 color;
     vec3 emissionColor;
     float emissionStrength;
+    float smoothness;
 };
 
 struct HitInfo {

@@ -18,18 +18,18 @@ class Sphere {
 public:
 	glm::vec3 position;
 	float radius;
-
 	glm::vec4 color;
-
 	glm::vec3 emissionColor;
 	float emissionStrength;
+	float smoothness;
 
 	Sphere(
 		const glm::vec3& position,
 		float radius,
 		const glm::vec4& color,
 		const glm::vec3& emissionColor,
-		float emissionStrength
+		float emissionStrength,
+		float smoothness
 	);
 };
 
