@@ -2,7 +2,7 @@
 #define RAYTRACER_SCENE_H
 #include "camera.h"
 #include "shaders.h"
-#include "Sphere.h"
+#include "../objects/headers/Sphere.h"
 #include "../objects/headers/Triangle.h"
 
 

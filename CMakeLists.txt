@@ -45,6 +45,8 @@ add_executable(raytracer
         src/objects/headers/Triangle.h
         src/objects/Cube.cpp
         src/objects/headers/Cube.h
+        src/objects/Quad.cpp
+        src/objects/headers/Quad.h
 )
 
 target_link_libraries(raytracer PRIVATE
