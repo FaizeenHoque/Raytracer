@@ -16,6 +16,7 @@ public:
 	float aspect;
 	float nearPlane;
 	float farPlane;
+	float focusDistance;
 
 	float sensitivity;
 	float walkSpeed;
@@ -23,13 +24,25 @@ public:
 	float pitch;
 
 	float divergeStrength;
+	float defocusStrength;
 
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, -20.0f);
 	glm::vec3 forward{};
 	glm::vec3 up{};
 	glm::vec3 right{};
 
-	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch, float divergeStrength);
+	Camera(Shader shaderProgram,
+		float fov,
+		float aspect,
+		float nearPlane,
+		float farPlane,
+		float focusDistance,
+		float sensitivity,
+		float walkSpeed,
+		float yaw,
+		float pitch,
+		float divergeStrength,
+		float defocusStrength);
 
 	void OnRenderImage(int width, int height);
 	void UpdateCameraParams(int width, int height);

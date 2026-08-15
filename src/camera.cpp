@@ -2,40 +2,58 @@
 
 #include "headers/camera.h"
 
+Camera::Camera(Shader shader,
+               float fov,
+               float aspect,
+               float nearPlane,
+               float farPlane,
+               float focusDistance,
+               float sensitivity,
+               float walkSpeed,
+               float yaw,
+               float pitch,
+               float divergeStrength,
+               float defocusStrength)
+    : shaderProgram(shader), fov(fov), aspect(aspect),
+      nearPlane(nearPlane), farPlane(farPlane), focusDistance(focusDistance), sensitivity(sensitivity),
+      walkSpeed(walkSpeed), yaw(yaw), pitch(pitch),
+      divergeStrength(divergeStrength), defocusStrength(defocusStrength)
+{
+    shaderProgram.Activate();
 
-Camera::Camera(Shader shader, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch, float divergeStrength)
-	: shaderProgram(shader), fov(fov), aspect(aspect), nearPlane(nearPlane), farPlane(farPlane), sensitivity(sensitivity), walkSpeed(walkSpeed), yaw(yaw), pitch(pitch), divergeStrength(divergeStrength) {
-	shaderProgram.Activate();
+    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    forward = glm::normalize(target - position);
+    right = glm::normalize(glm::cross(forward, worldUp));
+    up = glm::cross(right, forward);
 
-	forward = glm::normalize(target - position);
-	right = glm::normalize(glm::cross(forward, worldUp));
-	up = glm::cross(right, forward);
-
-	view = glm::lookAt(position, target, worldUp);
+    view = glm::lookAt(position, target, worldUp);
 }
 
-void Camera::OnRenderImage(int width, int height) {
-	this->UpdateCameraParams(width, height);
+void Camera::OnRenderImage(int width, int height)
+{
+    this->UpdateCameraParams(width, height);
 }
 
-void Camera::UpdateCameraParams(int width, int height) {
-	float planeHeight = nearPlane * std::tan(glm::radians(fov) * 0.5f) * 2.0f;
-	float planeWidth = planeHeight * aspect;
+void Camera::UpdateCameraParams(int width, int height)
+{
+    float planeHeight = focusDistance * std::tan(glm::radians(fov) * 0.5f) * 2.0f;
+    float planeWidth = planeHeight * aspect;
 
-	shaderProgram.Activate();
+    shaderProgram.Activate();
 
-	glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
-	glUniform3fv(glGetUniformLocation(shaderProgram.ID, "viewParams"), 1, glm::value_ptr(glm::vec3(planeWidth, planeHeight, nearPlane)));
-	glm::mat4 camLocalToWorld = glm::inverse(view);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "camLocalToWorldMatrix"), 1, GL_FALSE, glm::value_ptr(camLocalToWorld));
-	glUniform3fv(glGetUniformLocation(shaderProgram.ID, "worldSpaceCameraPos"), 1, glm::value_ptr(position));
-	glUniform1f(glGetUniformLocation(shaderProgram.ID, "DivergeStrength"), divergeStrength);
+    glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
+    glUniform3fv(glGetUniformLocation(shaderProgram.ID, "viewParams"), 1, glm::value_ptr(glm::vec3(planeWidth, planeHeight, focusDistance)));
+    glm::mat4 camLocalToWorld = glm::inverse(view);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "camLocalToWorldMatrix"), 1, GL_FALSE, glm::value_ptr(camLocalToWorld));
+    glUniform3fv(glGetUniformLocation(shaderProgram.ID, "worldSpaceCameraPos"), 1, glm::value_ptr(position));
+    glUniform1f(glGetUniformLocation(shaderProgram.ID, "DivergeStrength"), divergeStrength);
+    glUniform1f(glGetUniformLocation(shaderProgram.ID, "DefocusStrength"), defocusStrength);
 }
 
-bool Camera::Look(GLFWwindow *window, float deltaTime) {
+bool Camera::Look(GLFWwindow *window, float deltaTime)
+{
     float walkSpeed_ = walkSpeed * deltaTime;
 
     glm::vec3 oldPosition = position;
@@ -49,7 +67,8 @@ bool Camera::Look(GLFWwindow *window, float deltaTime) {
     double mouseX, mouseY;
     glfwGetCursorPos(window, &mouseX, &mouseY);
 
-    if (firstMouse) {
+    if (firstMouse)
+    {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
         firstMouse = false;
@@ -80,8 +99,7 @@ bool Camera::Look(GLFWwindow *window, float deltaTime) {
     up = glm::normalize(glm::cross(right, forward));
 
     glm::vec3 flatForward = glm::normalize(
-        glm::vec3(forward.x, 0.0f, forward.z)
-    );
+        glm::vec3(forward.x, 0.0f, forward.z));
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         position -= flatForward * walkSpeed_;
@@ -101,7 +119,8 @@ bool Camera::Look(GLFWwindow *window, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         position.y -= walkSpeed_;
 
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
         position = glm::vec3(0.0f, 0.0f, -5.0f);
         yaw = -90.0f;
         pitch = 0.0f;
@@ -110,8 +129,7 @@ bool Camera::Look(GLFWwindow *window, float deltaTime) {
     view = glm::lookAt(
         position,
         position + forward,
-        worldUp
-    );
+        worldUp);
 
     return position != oldPosition ||
            yaw != oldYaw ||

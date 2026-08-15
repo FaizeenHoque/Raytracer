@@ -20,7 +20,9 @@
 #define CAMERA_YAW -90.0f
 #define CAMERA_PITCH 0.0f
 
-#define DIVERGE_STRENGTH 0.1
+#define FOCUS_DISTANCE 12.0f
+#define DIVERGE_STRENGTH 0.2
+#define DEFOCUS_STRENGTH 200
 
 // Scene
 #define SHOW_ENVIRONMENT false
@@ -60,15 +62,17 @@ int main()
 
     Shader shaderProgram("../shaders/default.vert", "../shaders/default.frag");
     Camera camera(shaderProgram,
-    	CAMERA_FOV,
-    	static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),
-    	CAMERA_NEAR,
-    	CAMERA_FAR,
-    	SENSITIVITY,
-    	WALK_SPEED,
-    	CAMERA_YAW,
-    	CAMERA_PITCH,
-    	(float)(DIVERGE_STRENGTH*std::pow(10, -2)));
+                  CAMERA_FOV,
+                  static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),
+                  CAMERA_NEAR,
+                  CAMERA_FAR,
+                  FOCUS_DISTANCE,
+                  SENSITIVITY,
+                  WALK_SPEED,
+                  CAMERA_YAW,
+                  CAMERA_PITCH,
+                  static_cast<float>(DIVERGE_STRENGTH * std::pow(10, -2)),
+                  static_cast<float>(DEFOCUS_STRENGTH));
     Scene scene(shaderProgram, camera, WINDOW_WIDTH, WINDOW_HEIGHT, SHOW_ENVIRONMENT);
     scene.Setup();
 

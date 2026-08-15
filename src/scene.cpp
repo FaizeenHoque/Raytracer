@@ -1,6 +1,7 @@
 #include "headers/scene.h"
 
 #include <memory>
+#include <random>
 
 #include "headers/camera.h"
 #include "headers/sphere.h"
@@ -291,23 +292,34 @@ void Scene::Setup()
 			n_bottom, n_bottom, n_bottom, boxColor, noEmission, 0.0f));
 	};
 
-	glm::vec4 sphereColor(1.0f, 0.0f, 0.0f, 1.0f);
+	// Foreground subject: its focal plane is 12 units in front of the camera.
+	const glm::vec4 foregroundSphereColor(1.0f, 0.0f, 0.0f, 1.0f);
+	sphereManager.AddSphere(Sphere(
+		glm::vec3(0.0f, 3.0f, -8.0f),
+		1.05f,
+		foregroundSphereColor,
+		noEmission,
+		0.0f,
+		1.0f,
+		1.0f,
+		matteSpecularColor));
 
-	// Four matte blue spheres across the center of the room.
-	const float sphereRadius = 1.05f;
-	const float sphereSmoothness = 1.0f;
-	const float sphereY = 3.0f;
-	const float sphereZ = -5.2f;
-	for (float x : {0.0f})
-	{ //-3.1f, -1.05f, 1.05f, 3.1f
+	// Keep the background arrangement reproducible while giving each sphere a
+	// random position and colour just in front of the rear wall.
+	std::mt19937 rng(42);
+	std::uniform_real_distribution<float> xDistribution(-4.0f, 4.0f);
+	std::uniform_real_distribution<float> yDistribution(1.1f, 6.7f);
+	std::uniform_real_distribution<float> colourDistribution(0.2f, 0.95f);
+	for (int i = 0; i < 30; ++i)
+	{
 		sphereManager.AddSphere(Sphere(
-			glm::vec3(x, sphereY, sphereZ),
-			sphereRadius,
-			sphereColor,
+			glm::vec3(xDistribution(rng), yDistribution(rng), -1.55f),
+			0.42f,
+			glm::vec4(colourDistribution(rng), colourDistribution(rng), colourDistribution(rng), 1.0f),
 			noEmission,
 			0.0f,
-			sphereSmoothness,
-			1.0f,
+			0.15f,
+			0.1f,
 			matteSpecularColor));
 	}
 
