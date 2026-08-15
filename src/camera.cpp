@@ -17,24 +17,21 @@ Camera::Camera(Shader shader, float fov, float aspect, float nearPlane, float fa
 	view = glm::lookAt(position, target, worldUp);
 }
 
-void Camera::OnRenderImage() {
-	this->UpdateCameraParams();
+void Camera::OnRenderImage(int width, int height) {
+	this->UpdateCameraParams(width, height);
 }
 
-void Camera::UpdateCameraParams() {
+void Camera::UpdateCameraParams(int width, int height) {
 	float planeHeight = nearPlane * std::tan(glm::radians(fov) * 0.5f) * 2.0f;
 	float planeWidth = planeHeight * aspect;
+
 	shaderProgram.Activate();
 
-	const GLuint viewParamsLoc = glGetUniformLocation(shaderProgram.ID, "viewParams");
-	glUniform3fv(viewParamsLoc, 1, glm::value_ptr(glm::vec3(planeWidth, planeHeight, nearPlane)));
-
+	glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
+	glUniform3fv(glGetUniformLocation(shaderProgram.ID, "viewParams"), 1, glm::value_ptr(glm::vec3(planeWidth, planeHeight, nearPlane)));
 	glm::mat4 camLocalToWorld = glm::inverse(view);
-	const GLuint camMatLoc = glGetUniformLocation(shaderProgram.ID, "camLocalToWorldMatrix");
-	glUniformMatrix4fv(camMatLoc, 1, GL_FALSE, glm::value_ptr(camLocalToWorld));
-
-	const GLuint camPosLoc = glGetUniformLocation(shaderProgram.ID, "worldSpaceCameraPos");
-	glUniform3fv(camPosLoc, 1, glm::value_ptr(position));
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "camLocalToWorldMatrix"), 1, GL_FALSE, glm::value_ptr(camLocalToWorld));
+	glUniform3fv(glGetUniformLocation(shaderProgram.ID, "worldSpaceCameraPos"), 1, glm::value_ptr(position));
 }
 
 bool Camera::Look(GLFWwindow *window, float deltaTime) {

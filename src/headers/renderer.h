@@ -8,7 +8,7 @@ public:
 	renderer(Shader& shaderProgram, int width, int height);
 	~renderer();
 
-	void Render();
+	void Render(int MaxBounceCount, int NumRaysPerPixel);
 	void ResetAccumulation();
 
 private:

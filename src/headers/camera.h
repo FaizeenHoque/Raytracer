@@ -29,8 +29,8 @@ public:
 
 	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch);
 
-	void OnRenderImage();
-	void UpdateCameraParams();
+	void OnRenderImage(int width, int height);
+	void UpdateCameraParams(int width, int height);
 	bool Look(GLFWwindow* window, float deltaTime);
 
 private:

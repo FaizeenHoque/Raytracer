@@ -83,7 +83,7 @@ void renderer::ResetAccumulation() {
     ClearAccumulationBuffers();
 }
 
-void renderer::Render() {
+void renderer::Render(int MaxBounceCount, int NumRaysPerPixel) {
     int prevIndex = 1 - currentIndex;
     static auto lastTime = std::chrono::steady_clock::now();
     static int frameCount = 0;
@@ -93,11 +93,12 @@ void renderer::Render() {
 
     shaderProgram.Activate();
 
-    glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 10);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 1);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
+	// Ray Tracing
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), MaxBounceCount);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), NumRaysPerPixel);
 
+	// Accumulation
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, accumTex[prevIndex]);
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "PreviousFrame"), 0);

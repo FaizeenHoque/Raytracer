@@ -3,20 +3,31 @@
 in vec2 uv;
 out vec4 FragColor;
 
-uniform vec2 screenSize;
-uniform int MaxBounceCount;
-uniform int NumRaysPerPixel;
-uniform vec3 viewParams;
+// Camera
 uniform mat4 camLocalToWorldMatrix;
 uniform vec3 worldSpaceCameraPos;
-uniform vec3 SkyColourHorizon;
-uniform vec3 SkyColourZenith;
-uniform vec3 GroundColour;
+uniform vec3 viewParams;
+uniform vec2 screenSize;
+
+// Ray Tracing
+uniform int MaxBounceCount;
+uniform int NumRaysPerPixel;
+
+// Accumulation
+uniform sampler2D PreviousFrame;
+uniform int NumRenderedFrames;
+
+// Lighting
 uniform vec3 SunLightDirection;
 uniform float SunFocus;
 uniform float SunIntensity;
-uniform sampler2D PreviousFrame;
-uniform int NumRenderedFrames;
+
+// Sky
+uniform vec3 SkyColourHorizon;
+uniform vec3 SkyColourZenith;
+uniform vec3 GroundColour;
+
+uniform bool showEnvironment;
 
 #include "types.glsl"
 #include "random.glsl"
@@ -66,7 +77,10 @@ vec3 Trace(Ray ray, inout uint rngState) {
                 rayColor /= survivalProbability;
             }
         } else {
-//            incomingLight += GetEnvironmentLight(ray) * rayColor;
+            if (showEnvironment == true)
+                incomingLight += GetEnvironmentLight(ray) * rayColor;
+            else
+                incomingLight *= 0;
             break;
         }
     }

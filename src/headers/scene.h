@@ -8,7 +8,7 @@
 
 class Scene {
 public:
-	Scene(Shader shaderProgram, float WINDOW_WIDTH, float WINDOW_HEIGHT);
+	Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WINDOW_HEIGHT, bool showEnvironment);
 
 	void Setup();
 	void SetupParams();
@@ -19,6 +19,7 @@ private:
 	Shader shaderProgram;
 	SphereManager sphereManager;
 	TriangleManager triangleManager;
+	bool showEnvironment;
 	float WINDOW_WIDTH;
 	float WINDOW_HEIGHT;
 };

@@ -6,13 +6,14 @@
 #include "headers/sphere.h"
 #include "headers/triangle.h"
 
-Scene::Scene(Shader shaderProgram, float WINDOW_WIDTH, float WINDOW_HEIGHT)
+Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WINDOW_HEIGHT, bool showEnvironment)
 	: shaderProgram(shaderProgram),
-	  camera(shaderProgram, 45.0f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f, 0.0f, 25.0f, -90.0f, 0.0f),
+	  camera(camera),
 	  sphereManager(shaderProgram),
 	  triangleManager(shaderProgram),
 	  WINDOW_WIDTH(WINDOW_WIDTH),
-	  WINDOW_HEIGHT(WINDOW_HEIGHT) {
+	  WINDOW_HEIGHT(WINDOW_HEIGHT),
+	  showEnvironment(showEnvironment) {
 }
 
 void Scene::Setup() {
@@ -345,4 +346,6 @@ void Scene::SetupParams() {
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "SunLightDirection"), sunDir.x, sunDir.y, sunDir.z);
 	glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunFocus"), 40.0f);
 	glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunIntensity"), 60.0f);
+
+	glUniform1i(glGetUniformLocation(shaderProgram.ID, "showEnvironment"), showEnvironment);
 }
