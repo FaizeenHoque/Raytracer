@@ -25,14 +25,13 @@ renderer::~renderer() {
 
 void renderer::CreateFullscreenQuad() {
     float quadVertices[] = {
-        -1.0f,  1.0f,
+        -1.0f, 1.0f,
         -1.0f, -1.0f,
-         1.0f, -1.0f,
+        1.0f, -1.0f,
 
-        -1.0f,  1.0f,
-         1.0f, -1.0f,
-         1.0f,  1.0f
-    };
+        -1.0f, 1.0f,
+        1.0f, -1.0f,
+        1.0f, 1.0f};
 
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
@@ -40,7 +39,7 @@ void renderer::CreateFullscreenQuad() {
     glBindVertexArray(quadVAO);
     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 }
@@ -86,8 +85,8 @@ void renderer::ResetAccumulation() {
 
 void renderer::Render() {
     int prevIndex = 1 - currentIndex;
-	static auto lastTime = std::chrono::steady_clock::now();
-	static int frameCount = 0;
+    static auto lastTime = std::chrono::steady_clock::now();
+    static int frameCount = 0;
 
     glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[currentIndex]);
     glViewport(0, 0, width, height);
@@ -95,8 +94,8 @@ void renderer::Render() {
     shaderProgram.Activate();
 
     glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 50);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 1);
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
 
     glActiveTexture(GL_TEXTURE0);
@@ -109,14 +108,16 @@ void renderer::Render() {
     numRenderedFrames++;
     currentIndex = prevIndex;
 
-	frameCount++;
-	auto now = std::chrono::steady_clock::now();
-	double elapsed = std::chrono::duration<double>(now - lastTime).count();
-	if (elapsed >= 1.0) {
-		std::cout << "FPS: " << frameCount / elapsed << std::endl;
-		frameCount = 0;
-		lastTime = now;
-	}
+	// FPS logger
+    frameCount++;
+    auto now = std::chrono::steady_clock::now();
+    double elapsed = std::chrono::duration<double>(now - lastTime).count();
+    if (elapsed >= 1.0)
+    {
+        std::cout << "FPS: " << frameCount / elapsed << std::endl;
+        frameCount = 0;
+        lastTime = now;
+    }
 }
 
 void renderer::RenderFullscreenQuad() {

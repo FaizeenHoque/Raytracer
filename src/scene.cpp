@@ -16,129 +16,304 @@ Scene::Scene(Shader shaderProgram, float WINDOW_WIDTH, float WINDOW_HEIGHT)
 }
 
 void Scene::Setup() {
-	glm::vec3 cubeMin(3.0f, 0.0f, -10.0f);
-	glm::vec3 cubeMax(7.0f, 4.0f, -6.0f);
+	camera.position.y = 4.0f;
+	camera.position.z = -60.0f;
 
-	glm::vec3 frontNormal(0.0f, 0.0f, -1.0f);
-	glm::vec3 backCubeNormal(0.0f, 0.0f, 1.0f);
-	glm::vec3 cubeLeftNormal(-1.0f, 0.0f, 0.0f);
-	glm::vec3 cubeRightNormal(1.0f, 0.0f, 0.0f);
-	glm::vec3 cubeTopNormal(0.0f, 1.0f, 0.0f);
-	glm::vec3 cubeBottomNormal(0.0f, -1.0f, 0.0f);
+	glm::vec3 roomMin(-5.0f, 0.0f, -10.0f);
+	glm::vec3 roomMax(5.0f, 8.0f, -1.0f);
 
-	glm::vec4 cubeColor(0.75f, 0.25f, 0.12f, 1.0f);
+	glm::vec3 leftNormal(1.0f, 0.0f, 0.0f);   // points inward
+	glm::vec3 rightNormal(-1.0f, 0.0f, 0.0f);
+	glm::vec3 backNormal(0.0f, 0.0f, -1.0f);
+	glm::vec3 frontNormal(0.0f, 0.0f, 1.0f);
+	glm::vec3 floorNormal(0.0f, 1.0f, 0.0f);
+	glm::vec3 ceilNormal(0.0f, -1.0f, 0.0f);
+
+	glm::vec4 redColor(0.65f, 0.05f, 0.05f, 1.0f);
+	glm::vec4 whiteColor(0.73f, 0.73f, 0.73f, 1.0f);
+	glm::vec4 grayColor(0.20f, 0.20f, 0.20f, 1.0f);
+	glm::vec4 blueColor(0.10f, 0.25f, 0.65f, 1.0f);
+	glm::vec4 lightGreen(0.35f, 0.65f, 0.30f, 1.0f);
+	glm::vec4 darkGreen(0.08f, 0.30f, 0.08f, 1.0f);
 	glm::vec3 noEmission(0.0f);
 
-	// Front
+	// Left wall (red)
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMin.z),
+		glm::vec3(roomMin.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMin.x, roomMin.y, roomMax.z),
+		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
+		leftNormal, leftNormal, leftNormal,
+		redColor, noEmission, 0.0f
+	));
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(roomMin.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
+		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
+		leftNormal, leftNormal, leftNormal,
+		redColor, noEmission, 0.0f
+	));
+
+	// Right wall (blue)
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(roomMax.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
+		glm::vec3(roomMax.x, roomMin.y, roomMax.z),
+		rightNormal, rightNormal, rightNormal,
+		blueColor, noEmission, 0.0f
+	));
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(roomMax.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
+		rightNormal, rightNormal, rightNormal,
+		blueColor, noEmission, 0.0f
+	));
+
+	// Back wall (gray)
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(roomMin.x, roomMin.y, roomMax.z),
+		glm::vec3(roomMax.x, roomMin.y, roomMax.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
+		backNormal, backNormal, backNormal,
+		grayColor, noEmission, 0.0f
+	));
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(roomMin.x, roomMin.y, roomMax.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
+		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
+		backNormal, backNormal, backNormal,
+		grayColor, noEmission, 0.0f
+	));
+
+	// Front wall: one inward-facing, one-sided quad. It closes the room for
+	// rays inside it while staying invisible from its exterior/back side.
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(roomMin.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
 		frontNormal, frontNormal, frontNormal,
-		cubeColor, noEmission, 0.0f
+		grayColor, noEmission, 0.0f
 	));
-
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMin.z),
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMin.z),
+		glm::vec3(roomMin.x, roomMin.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
+		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
 		frontNormal, frontNormal, frontNormal,
-		cubeColor, noEmission, 0.0f
+		grayColor, noEmission, 0.0f
 	));
 
-	// Back
+	// Floor (checkerboard, light/dark green)
+	const int checkerCols = 4;
+	const int checkerRows = 4;
+	float cellW = (roomMax.x - roomMin.x) / checkerCols;
+	float cellD = (roomMax.z - roomMin.z) / checkerRows;
+
+	for (int row = 0; row < checkerRows; row++) {
+		for (int col = 0; col < checkerCols; col++) {
+			float x0 = roomMin.x + col * cellW;
+			float x1 = x0 + cellW;
+			float z0 = roomMin.z + row * cellD;
+			float z1 = z0 + cellD;
+
+			glm::vec4 cellColor = ((row + col) % 2 == 0) ? lightGreen : darkGreen;
+
+			triangleManager.AddTriangle(Triangle(
+				glm::vec3(x0, roomMin.y, z0),
+				glm::vec3(x1, roomMin.y, z0),
+				glm::vec3(x1, roomMin.y, z1),
+				floorNormal, floorNormal, floorNormal,
+				cellColor, noEmission, 0.0f
+			));
+			triangleManager.AddTriangle(Triangle(
+				glm::vec3(x0, roomMin.y, z0),
+				glm::vec3(x1, roomMin.y, z1),
+				glm::vec3(x0, roomMin.y, z1),
+				floorNormal, floorNormal, floorNormal,
+				cellColor, noEmission, 0.0f
+			));
+		}
+	}
+
+	// Ceiling (white)
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMax.z),
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMax.z),
-		backCubeNormal, backCubeNormal, backCubeNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
+		ceilNormal, ceilNormal, ceilNormal,
+		whiteColor, noEmission, 0.0f
 	));
-
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMax.z),
-		backCubeNormal, backCubeNormal, backCubeNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
+		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
+		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
+		ceilNormal, ceilNormal, ceilNormal,
+		whiteColor, noEmission, 0.0f
 	));
 
-	// Left
+	// Ceiling light panel (emissive box with real thickness)
+	glm::vec3 lightMin(-1.5f, roomMax.y - 0.01f, -6.5f);
+	glm::vec3 lightMax(1.5f, roomMax.y - 0.01f, -3.5f);
+	glm::vec4 lightColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::vec3 lightEmission(1.0f, 1.0f, 0.9f);
+	float lightStrength = 20.0f;
+	float yOffset = 0.4f;
+
+	float lightBottomY = lightMin.y - yOffset;
+
+	glm::vec3 sideFrontNormal(0.0f, 0.0f, -1.0f);
+	glm::vec3 sideBackNormal(0.0f, 0.0f, 1.0f);
+	glm::vec3 sideLeftNormal(-1.0f, 0.0f, 0.0f);
+	glm::vec3 sideRightNormal(1.0f, 0.0f, 0.0f);
+
+	// Bottom face (the visible glowing surface)
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMin.z),
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMax.z),
-		cubeLeftNormal, cubeLeftNormal, cubeLeftNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
+		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
+		ceilNormal, ceilNormal, ceilNormal,
+		lightColor, lightEmission, lightStrength
 	));
-
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMax.z),
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMax.z),
-		cubeLeftNormal, cubeLeftNormal, cubeLeftNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
+		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
+		ceilNormal, ceilNormal, ceilNormal,
+		lightColor, lightEmission, lightStrength
 	));
 
-	// Right
+	// Front side (z = lightMin.z)
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMax.z),
-		cubeRightNormal, cubeRightNormal, cubeRightNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMin.z),
+		sideFrontNormal, sideFrontNormal, sideFrontNormal,
+		whiteColor, lightEmission, lightStrength
 	));
-
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMin.z),
-		cubeRightNormal, cubeRightNormal, cubeRightNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMin.z),
+		glm::vec3(lightMin.x, roomMax.y, lightMin.z),
+		sideFrontNormal, sideFrontNormal, sideFrontNormal,
+		whiteColor, lightEmission, lightStrength
 	));
 
-	// Top
+	// Back side (z = lightMax.z)
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMax.z),
-		cubeTopNormal, cubeTopNormal, cubeTopNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
+		glm::vec3(lightMin.x, roomMax.y, lightMax.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
+		sideBackNormal, sideBackNormal, sideBackNormal,
+		whiteColor, lightEmission, lightStrength
 	));
-
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMax.y, cubeMax.z),
-		glm::vec3(cubeMin.x, cubeMax.y, cubeMax.z),
-		cubeTopNormal, cubeTopNormal, cubeTopNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
+		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
+		sideBackNormal, sideBackNormal, sideBackNormal,
+		whiteColor, lightEmission, lightStrength
 	));
 
-	// Bottom
+	// Left side (x = lightMin.x)
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMax.z),
-		cubeBottomNormal, cubeBottomNormal, cubeBottomNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMin.x, roomMax.y, lightMin.z),
+		glm::vec3(lightMin.x, roomMax.y, lightMax.z),
+		sideLeftNormal, sideLeftNormal, sideLeftNormal,
+		whiteColor, lightEmission, lightStrength
 	));
-
 	triangleManager.AddTriangle(Triangle(
-		glm::vec3(cubeMin.x, cubeMin.y, cubeMin.z),
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMax.z),
-		glm::vec3(cubeMax.x, cubeMin.y, cubeMin.z),
-		cubeBottomNormal, cubeBottomNormal, cubeBottomNormal,
-		cubeColor, noEmission, 0.0f
+		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMin.x, roomMax.y, lightMax.z),
+		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
+		sideLeftNormal, sideLeftNormal, sideLeftNormal,
+		whiteColor, lightEmission, lightStrength
 	));
 
-	sphereManager.AddSphere(
-		Sphere(
-			glm::vec3(10.0f, 2.0f, -8.0f),
-			2.0f,
-			glm::vec4(0.10f, 0.35f, 0.75f, 1.0f),
-			glm::vec3(0.0f),
-			0.0f
-		)
+	// Right side (x = lightMax.x)
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMin.z),
+		sideRightNormal, sideRightNormal, sideRightNormal,
+		whiteColor, lightEmission, lightStrength
+	));
+	triangleManager.AddTriangle(Triangle(
+		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
+		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
+		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
+		sideRightNormal, sideRightNormal, sideRightNormal,
+		whiteColor, lightEmission, lightStrength
+	));
+
+	// Two matte cuboid subjects
+	auto addBox = [&](glm::vec3 minB, glm::vec3 maxB, glm::vec4 boxColor) {
+		glm::vec3 n_left(-1.0f, 0.0f, 0.0f);
+		glm::vec3 n_right(1.0f, 0.0f, 0.0f);
+		glm::vec3 n_front(0.0f, 0.0f, -1.0f);
+		glm::vec3 n_back(0.0f, 0.0f, 1.0f);
+		glm::vec3 n_top(0.0f, 1.0f, 0.0f);
+		glm::vec3 n_bottom(0.0f, -1.0f, 0.0f);
+
+		// Front
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, minB.z), glm::vec3(maxB.x, minB.y, minB.z), glm::vec3(maxB.x, maxB.y, minB.z),
+			n_front, n_front, n_front, boxColor, noEmission, 0.0f));
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, minB.z), glm::vec3(maxB.x, maxB.y, minB.z), glm::vec3(minB.x, maxB.y, minB.z),
+			n_front, n_front, n_front, boxColor, noEmission, 0.0f));
+
+		// Back
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, maxB.z), glm::vec3(minB.x, maxB.y, maxB.z), glm::vec3(maxB.x, maxB.y, maxB.z),
+			n_back, n_back, n_back, boxColor, noEmission, 0.0f));
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, maxB.z), glm::vec3(maxB.x, maxB.y, maxB.z), glm::vec3(maxB.x, minB.y, maxB.z),
+			n_back, n_back, n_back, boxColor, noEmission, 0.0f));
+
+		// Left
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, minB.z), glm::vec3(minB.x, maxB.y, minB.z), glm::vec3(minB.x, maxB.y, maxB.z),
+			n_left, n_left, n_left, boxColor, noEmission, 0.0f));
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, minB.z), glm::vec3(minB.x, maxB.y, maxB.z), glm::vec3(minB.x, minB.y, maxB.z),
+			n_left, n_left, n_left, boxColor, noEmission, 0.0f));
+
+		// Right
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(maxB.x, minB.y, minB.z), glm::vec3(maxB.x, minB.y, maxB.z), glm::vec3(maxB.x, maxB.y, maxB.z),
+			n_right, n_right, n_right, boxColor, noEmission, 0.0f));
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(maxB.x, minB.y, minB.z), glm::vec3(maxB.x, maxB.y, maxB.z), glm::vec3(maxB.x, maxB.y, minB.z),
+			n_right, n_right, n_right, boxColor, noEmission, 0.0f));
+
+		// Top
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, maxB.y, minB.z), glm::vec3(maxB.x, maxB.y, minB.z), glm::vec3(maxB.x, maxB.y, maxB.z),
+			n_top, n_top, n_top, boxColor, noEmission, 0.0f));
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, maxB.y, minB.z), glm::vec3(maxB.x, maxB.y, maxB.z), glm::vec3(minB.x, maxB.y, maxB.z),
+			n_top, n_top, n_top, boxColor, noEmission, 0.0f));
+
+		// Bottom
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, minB.z), glm::vec3(maxB.x, minB.y, maxB.z), glm::vec3(maxB.x, minB.y, minB.z),
+			n_bottom, n_bottom, n_bottom, boxColor, noEmission, 0.0f));
+		triangleManager.AddTriangle(Triangle(
+			glm::vec3(minB.x, minB.y, minB.z), glm::vec3(minB.x, minB.y, maxB.z), glm::vec3(minB.x, minB.y, maxB.z),
+			n_bottom, n_bottom, n_bottom, boxColor, noEmission, 0.0f));
+	};
+
+	// Taller box: left and farther back, matching the reference composition.
+	addBox(
+		glm::vec3(-3.2f, roomMin.y, -8.6f),
+		glm::vec3(-0.8f, roomMin.y + 5.0f, -6.0f),
+		whiteColor
+	);
+	// Shorter box: forward and to the right, partially overlapping the tall box.
+	addBox(
+		glm::vec3(-0.3f, roomMin.y, -5.8f),
+		glm::vec3(2.4f, roomMin.y + 2.7f, -3.2f),
+		darkGreen
 	);
 
 	triangleManager.Upload();

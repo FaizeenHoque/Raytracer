@@ -7,7 +7,7 @@ float RandomValue(inout uint state) {
 
 float RandomValueNormalDistribution(inout uint state) {
     float theta = 2 * 3.1415926 * RandomValue(state);
-    float rho = sqrt(-2 * log(RandomValue(state)));
+    float rho = sqrt(-2 * log(max(RandomValue(state), 1e-6)));
     return rho * cos(theta);
 }
 

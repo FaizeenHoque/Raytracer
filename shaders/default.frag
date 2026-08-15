@@ -36,20 +36,34 @@ vec3 GetEnvironmentLight(Ray ray) {
 vec3 Trace(Ray ray, inout uint rngState) {
     vec3 incomingLight = vec3(0.0);
     vec3 rayColor = vec3(1.0);
+    const float RAY_ORIGIN_EPSILON = 0.001;
+    const int RUSSIAN_ROULETTE_START_BOUNCE = 5;
 
     for (int i = 0; i <= MaxBounceCount; i++) {
         HitInfo hitinfo = CalculateRayCollision(ray);
 
         if (hitinfo.didHit) {
-            ray.origin = hitinfo.hitPoint;
+            ray.origin = hitinfo.hitPoint + hitinfo.normal * RAY_ORIGIN_EPSILON;
             ray.dir = normalize(hitinfo.normal + RandomDirection(rngState));
 
             RayTracingMaterial material = hitinfo.mat;
             vec3 emittedLight = material.emissionColor * material.emissionStrength;
             incomingLight += emittedLight * rayColor;
             rayColor *= material.color;
+
+            // The room keeps rays inside the triangle geometry, so nearly every
+            // pixel otherwise performs all 50 bounces.  Russian roulette keeps
+            // the 50-bounce maximum while terminating dim paths early. Dividing
+            // by the survival probability preserves the expected contribution.
+            if (i >= RUSSIAN_ROULETTE_START_BOUNCE) {
+                float survivalProbability = clamp(max(rayColor.r, max(rayColor.g, rayColor.b)), 0.05, 0.95);
+                if (RandomValue(rngState) > survivalProbability) {
+                    break;
+                }
+                rayColor /= survivalProbability;
+            }
         } else {
-            incomingLight += GetEnvironmentLight(ray) * rayColor;
+//            incomingLight += GetEnvironmentLight(ray) * rayColor;
             break;
         }
     }
