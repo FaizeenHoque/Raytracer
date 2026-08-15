@@ -12,15 +12,16 @@ public:
 
 	void Setup();
 
-	void Scene1();
+	void Scene3();
 	void Scene2();
+	void Scene1();
 
 	void SetupParams();
 	void SetShowEnvironment(bool enabled);
 	void SetMouseSensitivity(float value);
 	void SetMoveSpeed(float value);
-
 	void SetCameraYaw(float value);
+	void SetFocusDistance(float value);
 
 	Camera camera;
 
