@@ -155,8 +155,8 @@ void Scene::Setup() {
 	glm::vec3 lightMax(1.5f, roomMax.y - 0.01f, -3.5f);
 	glm::vec4 lightColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightEmission(1.0f, 1.0f, 0.9f);
-	float lightStrength = 20.0f;
-	float yOffset = 0.4f;
+	float lightStrength = 50.0f;
+	float yOffset = 0.1f;
 
 	float lightBottomY = lightMin.y - yOffset;
 

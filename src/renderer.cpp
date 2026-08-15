@@ -94,7 +94,7 @@ void renderer::Render() {
     shaderProgram.Activate();
 
     glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 50);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 10);
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 1);
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
 
