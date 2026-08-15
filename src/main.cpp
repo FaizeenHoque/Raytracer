@@ -20,12 +20,12 @@
 #define CAMERA_YAW -90.0f
 #define CAMERA_PITCH 0.0f
 
-#define FOCUS_DISTANCE 12.0f
+#define FOCUS_DISTANCE 20.0f
 #define DIVERGE_STRENGTH 0.2
 #define DEFOCUS_STRENGTH 200
 
 // Controls
-#define SENSITIVITY 0.0f
+#define SENSITIVITY 0.1f
 #define WALK_SPEED 25.0f
 
 // Raytracing
@@ -64,7 +64,7 @@ int main()
                   CAMERA_NEAR,
                   CAMERA_FAR,
                   FOCUS_DISTANCE,
-                  SENSITIVITY,
+				  SENSITIVITY,
                   WALK_SPEED,
                   CAMERA_YAW,
                   CAMERA_PITCH,

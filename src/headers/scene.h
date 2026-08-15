@@ -11,10 +11,16 @@ public:
 	Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WINDOW_HEIGHT, bool showEnvironment);
 
 	void Setup();
-	void SetupParams();
-	void SetShowEnvironment(bool enabled);
 
 	void Scene1();
+	void Scene2();
+
+	void SetupParams();
+	void SetShowEnvironment(bool enabled);
+	void SetMouseSensitivity(float value);
+	void SetMoveSpeed(float value);
+
+	void SetCameraYaw(float value);
 
 	Camera camera;
 
