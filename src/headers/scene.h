@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "shaders.h"
 #include "sphere.h"
+#include "triangle.h"
 
 
 class Scene {
@@ -17,6 +18,7 @@ public:
 private:
 	Shader shaderProgram;
 	SphereManager sphereManager;
+	TriangleManager triangleManager;
 	float WINDOW_WIDTH;
 	float WINDOW_HEIGHT;
 };

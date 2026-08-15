@@ -22,3 +22,13 @@ struct Sphere {
     float radius;
     RayTracingMaterial material;
 };
+
+struct Triangle {
+    vec3 posA;
+    vec3 posB;
+    vec3 posC;
+    vec3 normalA;
+    vec3 normalB;
+    vec3 normalC;
+    RayTracingMaterial material;
+};
