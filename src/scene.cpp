@@ -4,9 +4,9 @@
 #include <random>
 
 #include "headers/camera.h"
-#include "headers/Cube.h"
+#include "objects/headers/Cube.h"
 #include "headers/Sphere.h"
-#include "headers/Triangle.h"
+#include "objects/headers/Triangle.h"
 
 Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WINDOW_HEIGHT, bool showEnvironment)
 	: shaderProgram(shaderProgram),

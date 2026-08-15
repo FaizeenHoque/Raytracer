@@ -36,15 +36,15 @@ add_executable(raytracer
         src/shaders.cpp
         src/camera.cpp
         src/objects/Sphere.cpp
-        src/headers/Sphere.h
+        src/objects/headers/Sphere.h
         src/renderer.cpp
         src/headers/renderer.h
         src/scene.cpp
         src/headers/scene.h
         src/objects/Triangle.cpp
-        src/headers/Triangle.h
+        src/objects/headers/Triangle.h
         src/objects/Cube.cpp
-        src/headers/Cube.h
+        src/objects/headers/Cube.h
 )
 
 target_link_libraries(raytracer PRIVATE

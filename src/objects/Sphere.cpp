@@ -1,4 +1,4 @@
-#include "../headers/Sphere.h"
+#include "headers/Sphere.h"
 
 #include <iostream>
 

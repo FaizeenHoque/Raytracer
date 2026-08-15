@@ -1,9 +1,9 @@
 #ifndef RAYTRACER_TRIANGLE_H
 #define RAYTRACER_TRIANGLE_H
-#include "material.h"
+#include "../../headers/material.h"
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
-#include "shaders.h"
+#include "../../headers/shaders.h"
 
 
 

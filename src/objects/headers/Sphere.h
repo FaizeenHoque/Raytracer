@@ -5,8 +5,8 @@
 
 #include <glm/glm.hpp>
 
-#include "material.h"
-#include "shaders.h"
+#include "../../headers/material.h"
+#include "../../headers/shaders.h"
 #include "glad/glad.h"
 
 struct SphereGPU {
