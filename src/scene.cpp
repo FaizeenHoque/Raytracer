@@ -13,17 +13,19 @@ Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WIND
 	  triangleManager(shaderProgram),
 	  WINDOW_WIDTH(WINDOW_WIDTH),
 	  WINDOW_HEIGHT(WINDOW_HEIGHT),
-	  showEnvironment(showEnvironment) {
+	  showEnvironment(showEnvironment)
+{
 }
 
-void Scene::Setup() {
+void Scene::Setup()
+{
 	camera.position.y = 4.0f;
 	camera.position.z = -20.0f;
 
 	glm::vec3 roomMin(-5.0f, 0.0f, -10.0f);
 	glm::vec3 roomMax(5.0f, 8.0f, -1.0f);
 
-	glm::vec3 leftNormal(1.0f, 0.0f, 0.0f);   // points inward
+	glm::vec3 leftNormal(1.0f, 0.0f, 0.0f); // points inward
 	glm::vec3 rightNormal(-1.0f, 0.0f, 0.0f);
 	glm::vec3 backNormal(0.0f, 0.0f, -1.0f);
 	glm::vec3 frontNormal(0.0f, 0.0f, 1.0f);
@@ -32,10 +34,11 @@ void Scene::Setup() {
 
 	glm::vec4 redColor(0.65f, 0.05f, 0.05f, 1.0f);
 	glm::vec4 whiteColor(0.73f, 0.73f, 0.73f, 1.0f);
+	glm::vec4 blueColor(0.08f, 0.2f, 0.55f, 1.0f);
 	glm::vec4 grayColor(0.20f, 0.20f, 0.20f, 1.0f);
 	glm::vec4 greenColor(0.08f, 0.70f, 0.05f, 1.0f);
-	glm::vec4 floorLightColor(0.78f, 0.78f, 0.74f, 1.0f);
-	glm::vec4 floorDarkColor(0.04f, 0.04f, 0.04f, 1.0f);
+	glm::vec4 floorLightColor(0.45f, 0.75f, 0.35f, 1.0f);
+	glm::vec4 floorDarkColor(0.04f, 0.18f, 0.05f, 1.0f);
 
 	glm::vec3 noEmission(0.0f);
 	const float matteSpecularProbability = 0.15f;
@@ -47,15 +50,13 @@ void Scene::Setup() {
 		glm::vec3(roomMin.x, roomMin.y, roomMax.z),
 		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
 		leftNormal, leftNormal, leftNormal,
-		redColor, noEmission, 0.0f
-	));
+		redColor, noEmission, 0.0f));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(roomMin.x, roomMin.y, roomMin.z),
 		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
 		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
 		leftNormal, leftNormal, leftNormal,
-		redColor, noEmission, 0.0f
-	));
+		redColor, noEmission, 0.0f));
 
 	// Right wall (green)
 	triangleManager.AddTriangle(Triangle(
@@ -63,15 +64,13 @@ void Scene::Setup() {
 		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
 		glm::vec3(roomMax.x, roomMin.y, roomMax.z),
 		rightNormal, rightNormal, rightNormal,
-		greenColor, noEmission, 0.0f
-	));
+		blueColor, noEmission, 0.0f));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(roomMax.x, roomMin.y, roomMin.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
 		rightNormal, rightNormal, rightNormal,
-		greenColor, noEmission, 0.0f
-	));
+		blueColor, noEmission, 0.0f));
 
 	// Back wall (white)
 	triangleManager.AddTriangle(Triangle(
@@ -79,15 +78,13 @@ void Scene::Setup() {
 		glm::vec3(roomMax.x, roomMin.y, roomMax.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
 		backNormal, backNormal, backNormal,
-		whiteColor, noEmission, 0.0f
-	));
+		grayColor, noEmission, 0.0f));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(roomMin.x, roomMin.y, roomMax.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
 		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
 		backNormal, backNormal, backNormal,
-		whiteColor, noEmission, 0.0f
-	));
+		grayColor, noEmission, 0.0f));
 
 	// Front wall: one inward-facing, one-sided quad. It closes the room for
 	// rays inside it while staying invisible from its exterior/back side.
@@ -96,15 +93,13 @@ void Scene::Setup() {
 		glm::vec3(roomMax.x, roomMin.y, roomMin.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
 		frontNormal, frontNormal, frontNormal,
-		grayColor, noEmission, 0.0f
-	));
+		whiteColor, noEmission, 0.0f));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(roomMin.x, roomMin.y, roomMin.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
 		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
 		frontNormal, frontNormal, frontNormal,
-		grayColor, noEmission, 0.0f
-	));
+		whiteColor, noEmission, 0.0f));
 
 	// Floor (checkerboard, light/dark green)
 	const int checkerCols = 4;
@@ -112,29 +107,29 @@ void Scene::Setup() {
 	float cellW = (roomMax.x - roomMin.x) / checkerCols;
 	float cellD = (roomMax.z - roomMin.z) / checkerRows;
 
-	for (int row = 0; row < checkerRows; row++) {
-		for (int col = 0; col < checkerCols; col++) {
+	for (int row = 0; row < checkerRows; row++)
+	{
+		for (int col = 0; col < checkerCols; col++)
+		{
 			float x0 = roomMin.x + col * cellW;
 			float x1 = x0 + cellW;
 			float z0 = roomMin.z + row * cellD;
 			float z1 = z0 + cellD;
 
-		glm::vec4 cellColor = ((row + col) % 2 == 0) ? floorLightColor : floorDarkColor;
+			glm::vec4 cellColor = ((row + col) % 2 == 0) ? floorLightColor : floorDarkColor;
 
 			triangleManager.AddTriangle(Triangle(
 				glm::vec3(x0, roomMin.y, z0),
 				glm::vec3(x1, roomMin.y, z0),
 				glm::vec3(x1, roomMin.y, z1),
 				floorNormal, floorNormal, floorNormal,
-				cellColor, noEmission, 0.0f
-			));
+				cellColor, noEmission, 0.0f));
 			triangleManager.AddTriangle(Triangle(
 				glm::vec3(x0, roomMin.y, z0),
 				glm::vec3(x1, roomMin.y, z1),
 				glm::vec3(x0, roomMin.y, z1),
 				floorNormal, floorNormal, floorNormal,
-				cellColor, noEmission, 0.0f
-			));
+				cellColor, noEmission, 0.0f));
 		}
 	}
 
@@ -144,22 +139,20 @@ void Scene::Setup() {
 		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMin.z),
 		ceilNormal, ceilNormal, ceilNormal,
-		grayColor, noEmission, 0.0f
-	));
+		whiteColor, noEmission, 0.0f));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(roomMin.x, roomMax.y, roomMin.z),
 		glm::vec3(roomMin.x, roomMax.y, roomMax.z),
 		glm::vec3(roomMax.x, roomMax.y, roomMax.z),
 		ceilNormal, ceilNormal, ceilNormal,
-		grayColor, noEmission, 0.0f
-	));
+		whiteColor, noEmission, 0.0f));
 
 	// Ceiling light panel (emissive box with real thickness)
 	glm::vec3 lightMin(-1.35f, roomMax.y - 0.01f, -6.1f);
 	glm::vec3 lightMax(1.35f, roomMax.y - 0.01f, -4.8f);
 	glm::vec4 lightColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightEmission(1.0f, 1.0f, 0.9f);
-	float lightStrength = 100.0f;
+	float lightStrength = 15.0f * 3.0f;
 	float yOffset = 0.01f;
 
 	float lightBottomY = lightMin.y - yOffset;
@@ -175,15 +168,13 @@ void Scene::Setup() {
 		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
 		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
 		ceilNormal, ceilNormal, ceilNormal,
-		lightColor, lightEmission, lightStrength
-	));
+		lightColor, lightEmission, lightStrength));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
 		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
 		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
 		ceilNormal, ceilNormal, ceilNormal,
-		lightColor, lightEmission, lightStrength
-	));
+		lightColor, lightEmission, lightStrength));
 
 	// Front side (z = lightMin.z)
 	triangleManager.AddTriangle(Triangle(
@@ -191,15 +182,13 @@ void Scene::Setup() {
 		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
 		glm::vec3(lightMax.x, roomMax.y, lightMin.z),
 		sideFrontNormal, sideFrontNormal, sideFrontNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
 		glm::vec3(lightMax.x, roomMax.y, lightMin.z),
 		glm::vec3(lightMin.x, roomMax.y, lightMin.z),
 		sideFrontNormal, sideFrontNormal, sideFrontNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 
 	// Back side (z = lightMax.z)
 	triangleManager.AddTriangle(Triangle(
@@ -207,15 +196,13 @@ void Scene::Setup() {
 		glm::vec3(lightMin.x, roomMax.y, lightMax.z),
 		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
 		sideBackNormal, sideBackNormal, sideBackNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
 		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
 		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
 		sideBackNormal, sideBackNormal, sideBackNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 
 	// Left side (x = lightMin.x)
 	triangleManager.AddTriangle(Triangle(
@@ -223,15 +210,13 @@ void Scene::Setup() {
 		glm::vec3(lightMin.x, roomMax.y, lightMin.z),
 		glm::vec3(lightMin.x, roomMax.y, lightMax.z),
 		sideLeftNormal, sideLeftNormal, sideLeftNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(lightMin.x, lightBottomY, lightMin.z),
 		glm::vec3(lightMin.x, roomMax.y, lightMax.z),
 		glm::vec3(lightMin.x, lightBottomY, lightMax.z),
 		sideLeftNormal, sideLeftNormal, sideLeftNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 
 	// Right side (x = lightMax.x)
 	triangleManager.AddTriangle(Triangle(
@@ -239,18 +224,17 @@ void Scene::Setup() {
 		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
 		glm::vec3(lightMax.x, roomMax.y, lightMin.z),
 		sideRightNormal, sideRightNormal, sideRightNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 	triangleManager.AddTriangle(Triangle(
 		glm::vec3(lightMax.x, lightBottomY, lightMin.z),
 		glm::vec3(lightMax.x, lightBottomY, lightMax.z),
 		glm::vec3(lightMax.x, roomMax.y, lightMax.z),
 		sideRightNormal, sideRightNormal, sideRightNormal,
-		whiteColor, lightEmission, lightStrength
-	));
+		whiteColor, lightEmission, lightStrength));
 
 	// Two matte cuboid subjects
-	auto addBox = [&](glm::vec3 minB, glm::vec3 maxB, glm::vec4 boxColor) {
+	auto addBox = [&](glm::vec3 minB, glm::vec3 maxB, glm::vec4 boxColor)
+	{
 		glm::vec3 n_left(-1.0f, 0.0f, 0.0f);
 		glm::vec3 n_right(1.0f, 0.0f, 0.0f);
 		glm::vec3 n_front(0.0f, 0.0f, -1.0f);
@@ -314,7 +298,8 @@ void Scene::Setup() {
 	const float sphereSmoothness = 1.0f;
 	const float sphereY = 3.0f;
 	const float sphereZ = -5.2f;
-	for (float x : {0.0f}) {//-3.1f, -1.05f, 1.05f, 3.1f
+	for (float x : {0.0f})
+	{ //-3.1f, -1.05f, 1.05f, 3.1f
 		sphereManager.AddSphere(Sphere(
 			glm::vec3(x, sphereY, sphereZ),
 			sphereRadius,
@@ -322,16 +307,16 @@ void Scene::Setup() {
 			noEmission,
 			0.0f,
 			sphereSmoothness,
-			matteSpecularProbability,
-			matteSpecularColor
-		));
+			1.0f,
+			matteSpecularColor));
 	}
 
 	triangleManager.Upload();
 	sphereManager.Upload();
 }
 
-void Scene::SetupParams() {
+void Scene::SetupParams()
+{
 	shaderProgram.Activate();
 
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "numTriangles"), triangleManager.Count());

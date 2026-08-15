@@ -22,12 +22,12 @@
 #define SHOW_ENVIRONMENT false
 
 // Controls
-#define SENSITIVITY 0.1f
+#define SENSITIVITY 0.0f
 #define WALK_SPEED 25.0f
 
 // Raytracing
-#define MAX_BOUNCE_COUNT 10
-#define NUM_RAYS_PER_PIXEL 1
+#define MAX_BOUNCE_COUNT 15
+#define NUM_RAYS_PER_PIXEL 3
 
 int main()
 {
