@@ -1,7 +1,7 @@
 layout(std140) uniform SphereBuffer { Sphere spheres[100]; };
 uniform int numSpheres;
 
-layout(std140) uniform TriangleBuffer { Triangle triangles[100]; };
+layout(std140) uniform TriangleBuffer { Triangle triangles[128]; };
 uniform int numTriangles;
 
 HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius, RayTracingMaterial material) {

@@ -2,8 +2,8 @@
 #define RAYTRACER_SCENE_H
 #include "camera.h"
 #include "shaders.h"
-#include "sphere.h"
-#include "triangle.h"
+#include "Sphere.h"
+#include "Triangle.h"
 
 
 class Scene {

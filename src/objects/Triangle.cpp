@@ -1,4 +1,4 @@
-#include "../headers/triangle.h"
+#include "../headers/Triangle.h"
 
 #include <iostream>
 
@@ -111,8 +111,8 @@ void TriangleManager::VerifyLayout(Shader& shader) {
 	GLint blockSize;
 	glGetActiveUniformBlockiv(shader.ID, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
 
-	// blockSize / 100 (array length in your shader) should equal sizeof(TriangleGPU)
-	GLint perElement = blockSize / 100;
+	// blockSize / 128 (array length in the shader) should equal sizeof(TriangleGPU)
+	GLint perElement = blockSize / 128;
 	if (perElement != sizeof(TriangleGPU)) {
 		std::cerr << "TriangleGPU size mismatch! GPU expects "
 				   << perElement << " bytes, C++ struct is "
