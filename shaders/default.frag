@@ -9,6 +9,8 @@ uniform vec3 worldSpaceCameraPos;
 uniform vec3 viewParams;
 uniform vec2 screenSize;
 
+uniform float DivergeStrength;
+
 // Ray Tracing
 uniform int MaxBounceCount;
 uniform int NumRaysPerPixel;
@@ -97,13 +99,17 @@ void main() {
     vec3 viewPointLocal = vec3(uv - 0.5, 1.0) * viewParams;
     vec3 viewPoint = (camLocalToWorldMatrix * vec4(viewPointLocal, 1.0)).xyz;
 
-    Ray ray;
-    ray.origin = worldSpaceCameraPos;
-    ray.dir = normalize(viewPoint - ray.origin);
-
     vec3 totalIncomingLight = vec3(0.0);
 
     for (int rayIndex = 0; rayIndex < NumRaysPerPixel; rayIndex++) {
+        Ray ray;
+        ray.origin = worldSpaceCameraPos;
+        vec2 jitter = RandomPointInCircle(rngState) * DivergeStrength / numPixels.x;
+        vec3 jitteredViewPoint = viewPoint +
+            camLocalToWorldMatrix[0].xyz * jitter.x +
+            camLocalToWorldMatrix[1].xyz * jitter.y;
+        ray.dir = normalize(jitteredViewPoint - ray.origin);
+
         totalIncomingLight += Trace(ray, rngState);
     }
 

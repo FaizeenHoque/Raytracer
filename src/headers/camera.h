@@ -22,12 +22,14 @@ public:
 	float yaw;
 	float pitch;
 
+	float divergeStrength;
+
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, -20.0f);
 	glm::vec3 forward{};
 	glm::vec3 up{};
 	glm::vec3 right{};
 
-	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch);
+	Camera(Shader shaderProgram, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch, float divergeStrength);
 
 	void OnRenderImage(int width, int height);
 	void UpdateCameraParams(int width, int height);

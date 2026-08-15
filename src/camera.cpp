@@ -3,8 +3,8 @@
 #include "headers/camera.h"
 
 
-Camera::Camera(Shader shader, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch)
-	: shaderProgram(shader), fov(fov), aspect(aspect), nearPlane(nearPlane), farPlane(farPlane), sensitivity(sensitivity), walkSpeed(walkSpeed), yaw(yaw), pitch(pitch) {
+Camera::Camera(Shader shader, float fov, float aspect, float nearPlane, float farPlane, float sensitivity, float walkSpeed, float yaw, float pitch, float divergeStrength)
+	: shaderProgram(shader), fov(fov), aspect(aspect), nearPlane(nearPlane), farPlane(farPlane), sensitivity(sensitivity), walkSpeed(walkSpeed), yaw(yaw), pitch(pitch), divergeStrength(divergeStrength) {
 	shaderProgram.Activate();
 
 	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -32,6 +32,7 @@ void Camera::UpdateCameraParams(int width, int height) {
 	glm::mat4 camLocalToWorld = glm::inverse(view);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "camLocalToWorldMatrix"), 1, GL_FALSE, glm::value_ptr(camLocalToWorld));
 	glUniform3fv(glGetUniformLocation(shaderProgram.ID, "worldSpaceCameraPos"), 1, glm::value_ptr(position));
+	glUniform1f(glGetUniformLocation(shaderProgram.ID, "DivergeStrength"), divergeStrength);
 }
 
 bool Camera::Look(GLFWwindow *window, float deltaTime) {

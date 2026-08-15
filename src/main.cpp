@@ -9,16 +9,20 @@
 #include "headers/shaders.h"
 #include "headers/renderer.h"
 
-// Scene
+// Window
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
+// Camera
 #define CAMERA_FOV 45.0f
 #define CAMERA_NEAR 0.01f
 #define CAMERA_FAR 1000.0f
 #define CAMERA_YAW -90.0f
 #define CAMERA_PITCH 0.0f
 
+#define DIVERGE_STRENGTH 0.1
+
+// Scene
 #define SHOW_ENVIRONMENT false
 
 // Controls
@@ -63,7 +67,8 @@ int main()
     	SENSITIVITY,
     	WALK_SPEED,
     	CAMERA_YAW,
-    	CAMERA_PITCH);
+    	CAMERA_PITCH,
+    	(float)(DIVERGE_STRENGTH*std::pow(10, -2)));
     Scene scene(shaderProgram, camera, WINDOW_WIDTH, WINDOW_HEIGHT, SHOW_ENVIRONMENT);
     scene.Setup();
 
