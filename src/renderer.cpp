@@ -1,4 +1,6 @@
 #include "headers/renderer.h"
+
+#include <chrono>
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -84,6 +86,8 @@ void renderer::ResetAccumulation() {
 
 void renderer::Render() {
     int prevIndex = 1 - currentIndex;
+	static auto lastTime = std::chrono::steady_clock::now();
+	static int frameCount = 0;
 
     glBindFramebuffer(GL_FRAMEBUFFER, accumFBO[currentIndex]);
     glViewport(0, 0, width, height);
@@ -91,19 +95,9 @@ void renderer::Render() {
     shaderProgram.Activate();
 
     glUniform2f(glGetUniformLocation(shaderProgram.ID, "screenSize"), (float)width, (float)height);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 8);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 2);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), 30);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), 10);
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);
-
-    glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 1.0f, 1.0f, 1.0f);
-    glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourZenith"), 0.3f, 0.5f, 1.0f);
-    glUniform3f(glGetUniformLocation(shaderProgram.ID, "GroundColour"), 0.35f, 0.3f, 0.25f);
-
-    glm::vec3 sunDir = glm::normalize(glm::vec3(0.3f, -0.2f, 0.5f));
-    glUniform3f(glGetUniformLocation(shaderProgram.ID, "SunLightDirection"), sunDir.x, sunDir.y, sunDir.z);
-
-    glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunFocus"), 500.0f);
-    glUniform1f(glGetUniformLocation(shaderProgram.ID, "SunIntensity"), 10.0f);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, accumTex[prevIndex]);
@@ -114,6 +108,15 @@ void renderer::Render() {
 
     numRenderedFrames++;
     currentIndex = prevIndex;
+
+	frameCount++;
+	auto now = std::chrono::steady_clock::now();
+	double elapsed = std::chrono::duration<double>(now - lastTime).count();
+	if (elapsed >= 1.0) {
+		std::cout << "FPS: " << frameCount / elapsed << std::endl;
+		frameCount = 0;
+		lastTime = now;
+	}
 }
 
 void renderer::RenderFullscreenQuad() {

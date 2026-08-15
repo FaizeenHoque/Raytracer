@@ -10,6 +10,7 @@ public:
 	Scene(Shader shaderProgram, float WINDOW_WIDTH, float WINDOW_HEIGHT);
 
 	void Setup();
+	void SetupParams();
 
 	Camera camera;
 
@@ -20,4 +21,4 @@ private:
 	float WINDOW_HEIGHT;
 };
 
-#endif //RAYTRACER_SCENE_H
+#endif

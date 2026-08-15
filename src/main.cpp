@@ -59,6 +59,7 @@ int main() {
 
         scene.camera.OnRenderImage();
         renderer.Render();
+    	scene.SetupParams();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
