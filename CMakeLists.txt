@@ -23,6 +23,7 @@ add_library(glad
         libraries/glad/src/glad.c
         src/headers/cube.h
         src/headers/camera.h
+        src/headers/material.h
 )
 
 target_include_directories(glad PUBLIC

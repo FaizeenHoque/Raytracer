@@ -5,13 +5,13 @@
 
 #include <glm/glm.hpp>
 
+#include "material.h"
 #include "shaders.h"
 #include "glad/glad.h"
 
 struct SphereGPU {
 	glm::vec4 positionRadius;
-	glm::vec4 color;
-	glm::vec4 emission;
+	MaterialGPU material;
 };
 
 class Sphere {

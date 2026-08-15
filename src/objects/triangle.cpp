@@ -27,6 +27,7 @@ Triangle::Triangle(
 TriangleManager::TriangleManager(Shader &shader) {
 	glGenBuffers(1, &triangleUBO);
 	BindToShader(shader);
+	VerifyLayout(shader);
 }
 
 TriangleManager::~TriangleManager() {
@@ -49,8 +50,11 @@ void TriangleManager::Upload() const {
 			triangle.normalA, 0.0f,
 			triangle.normalB, 0.0f,
 			triangle.normalC, 0.0f,
-			triangle.color, 0.0f,
-			triangle.emissionColor, triangle.emissionStrength
+			MaterialGPU{
+				triangle.color,             0.0f,
+				triangle.emissionColor,
+				triangle.emissionStrength
+			}
 		});
 	}
 
@@ -65,6 +69,10 @@ void TriangleManager::Upload() const {
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, TRIANGLE_BUFFER_BINDING, triangleUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+std::size_t TriangleManager::Count() {
+	return triangles.size();
 }
 
 void TriangleManager::BindToShader(Shader &shader) {
@@ -83,4 +91,22 @@ void TriangleManager::BindToShader(Shader &shader) {
 		triangleBlockIndex,
 		TRIANGLE_BUFFER_BINDING
 	);
+}
+
+void TriangleManager::VerifyLayout(Shader& shader) {
+	GLuint blockIndex = glGetUniformBlockIndex(shader.ID, "TriangleBuffer");
+	if (blockIndex == GL_INVALID_INDEX) return;
+
+	GLint blockSize;
+	glGetActiveUniformBlockiv(shader.ID, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+	// blockSize / 100 (array length in your shader) should equal sizeof(TriangleGPU)
+	GLint perElement = blockSize / 100;
+	if (perElement != sizeof(TriangleGPU)) {
+		std::cerr << "TriangleGPU size mismatch! GPU expects "
+				   << perElement << " bytes, C++ struct is "
+				   << sizeof(TriangleGPU) << " bytes" << std::endl;
+	} else {
+		std::cout << "TriangleGPU layout OK (" << sizeof(TriangleGPU) << " bytes)" << std::endl;
+	}
 }

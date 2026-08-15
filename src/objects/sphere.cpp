@@ -40,20 +40,15 @@ void SphereManager::Upload() const
 
 	for (const Sphere& sphere : spheres) {
 		gpuSpheres.push_back({
-			glm::vec4(
-				sphere.position,
-				sphere.radius
-			),
-
-			sphere.color,
-
-			glm::vec4(
+			glm::vec4(sphere.position, sphere.radius),
+			MaterialGPU{
+				glm::vec3(sphere.color),
+				0.0f,
 				sphere.emissionColor,
-				sphere.emissionStrength
-			)
+				sphere.emissionStrength,
+			}
 		});
 	}
-
 	glBindBuffer(GL_UNIFORM_BUFFER, sphereUBO);
 
 	glBufferData(
