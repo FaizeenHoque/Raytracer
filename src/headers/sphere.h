@@ -41,6 +41,8 @@ public:
 	void AddSphere(const Sphere& sphere);
 	void Upload() const;
 
+	std::size_t Count();
+
 private:
 	void BindToShader(Shader& shader);
 

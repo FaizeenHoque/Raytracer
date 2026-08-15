@@ -67,6 +67,10 @@ void SphereManager::Upload() const
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+std::size_t SphereManager::Count() {
+	return spheres.size();
+}
+
 void SphereManager::BindToShader(Shader& shader)
 {
 	shader.Activate();

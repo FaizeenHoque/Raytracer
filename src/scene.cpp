@@ -324,7 +324,7 @@ void Scene::SetupParams() {
 	shaderProgram.Activate();
 
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "numTriangles"), triangleManager.Count());
-	glUniform1i(glGetUniformLocation(shaderProgram.ID, "numSpheres"), 1);
+	glUniform1i(glGetUniformLocation(shaderProgram.ID, "numSpheres"), sphereManager.Count());
 
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourHorizon"), 0.95f, 0.93f, 0.9f);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "SkyColourZenith"), 0.45f, 0.6f, 0.9f);
