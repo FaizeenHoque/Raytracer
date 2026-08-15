@@ -12,6 +12,9 @@ public:
 
 	void Setup();
 	void SetupParams();
+	void SetShowEnvironment(bool enabled);
+
+	void Scene1();
 
 	Camera camera;
 

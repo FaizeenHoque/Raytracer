@@ -19,8 +19,20 @@ Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WIND
 {
 }
 
-void Scene::Setup()
+void Scene::SetShowEnvironment(bool enabled)
 {
+	showEnvironment = enabled;
+}
+
+void Scene::Setup() {
+	Scene1();
+	triangleManager.Upload();
+	sphereManager.Upload();
+}
+
+void Scene::Scene1() {
+	SetShowEnvironment(false);
+
 	camera.position.y = 4.0f;
 	camera.position.z = -20.0f;
 
@@ -95,13 +107,9 @@ void Scene::Setup()
 			0.1f,
 			matteSpecularColor));
 	}
-
-	triangleManager.Upload();
-	sphereManager.Upload();
 }
 
-void Scene::SetupParams()
-{
+void Scene::SetupParams() {
 	shaderProgram.Activate();
 
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "numTriangles"), triangleManager.Count());

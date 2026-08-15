@@ -24,9 +24,6 @@
 #define DIVERGE_STRENGTH 0.2
 #define DEFOCUS_STRENGTH 200
 
-// Scene
-#define SHOW_ENVIRONMENT false
-
 // Controls
 #define SENSITIVITY 0.0f
 #define WALK_SPEED 25.0f
@@ -73,7 +70,7 @@ int main()
                   CAMERA_PITCH,
                   static_cast<float>(DIVERGE_STRENGTH * std::pow(10, -2)),
                   static_cast<float>(DEFOCUS_STRENGTH));
-    Scene scene(shaderProgram, camera, WINDOW_WIDTH, WINDOW_HEIGHT, SHOW_ENVIRONMENT);
+    Scene scene(shaderProgram, camera, WINDOW_WIDTH, WINDOW_HEIGHT, true);
     scene.Setup();
 
     // Initialize renderer
@@ -91,9 +88,9 @@ int main()
         if (cameraMoved)
             renderer.ResetAccumulation();
 
+    	scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
         renderer.Render(MAX_BOUNCE_COUNT, NUM_RAYS_PER_PIXEL);
-        scene.SetupParams();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
