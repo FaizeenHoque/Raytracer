@@ -30,7 +30,7 @@
 
 // Raytracing
 #define MAX_BOUNCE_COUNT 15
-#define NUM_RAYS_PER_PIXEL 3
+#define NUM_RAYS_PER_PIXEL 4
 
 int main()
 {
