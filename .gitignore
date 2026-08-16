@@ -2,3 +2,4 @@ libraries/
 .idea/
 cmake-build-debug/
 build/
+builds/
