@@ -20,10 +20,104 @@ Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WIND
 }
 
 void Scene::Setup() {
-	Scene3();
+	Scene4();
 	triangleManager.Upload();
 	sphereManager.Upload();
 }
+
+void Scene::Scene4() {
+	SetShowEnvironment(false);
+	SetMouseSensitivity(0.0f);
+	SetMoveSpeed(0.0f);
+
+	camera.position.y = 4.0f;
+	camera.position.z = -20.0f;
+	camera.defocusStrength = 0.0f;
+
+	glm::vec3 roomMin(-6.0f, 0.0f, -10.0f);
+	glm::vec3 roomMax(6.0f, 8.0f, -1.0f);
+
+	glm::vec4 redColor(0.65f, 0.05f, 0.05f, 1.0f);
+	glm::vec4 whiteColor(0.73f, 0.73f, 0.73f, 1.0f);
+	glm::vec4 blueColor(0.08f, 0.2f, 0.55f, 1.0f);
+	glm::vec4 greenColor(0.05f, 0.55f, 0.12f, 1.0f);
+	glm::vec4 grayColor(0.20f, 0.20f, 0.20f, 1.0f);
+	glm::vec4 floorLightColor(1.0f);
+	glm::vec4 floorDarkColor(0.0f);
+
+	glm::vec3 noEmission(0.0f);
+	const glm::vec3 matteSpecularColor(1.0f);
+
+	const glm::vec3 roomCenter = (roomMin + roomMax) * 0.5f;
+	const glm::vec3 roomSize = roomMax - roomMin;
+	const glm::vec3 noRotation(0.0f);
+
+	Quad(triangleManager, glm::vec3(roomSize.y, 1.0f, roomSize.z), glm::vec3(roomMin.x, roomCenter.y, roomCenter.z), glm::vec3(0.0f, 0.0f, -90.0f), redColor);
+	Quad(triangleManager, glm::vec3(roomSize.y, 1.0f, roomSize.z), glm::vec3(roomMax.x, roomCenter.y, roomCenter.z), glm::vec3(0.0f, 0.0f, 90.0f), greenColor);
+	Quad(triangleManager, glm::vec3(roomSize.x, 1.0f, roomSize.y), glm::vec3(roomCenter.x, roomCenter.y, roomMax.z), glm::vec3(-90.0f, 0.0f, 0.0f), whiteColor);
+	Quad(triangleManager, glm::vec3(roomSize.x, 1.0f, roomSize.y), glm::vec3(roomCenter.x, roomCenter.y, roomMin.z), glm::vec3(90.0f, 0.0f, 0.0f), grayColor);
+
+	// Checkerboard floor tiles.
+	const int checkerCols = 6;
+	const int checkerRows = 6;
+	const float cellWidth = roomSize.x / checkerCols;
+	const float cellDepth = roomSize.z / checkerRows;
+	for (int row = 0; row < checkerRows; ++row)
+	{
+		for (int col = 0; col < checkerCols; ++col)
+		{
+			const glm::vec4& cellColor = (row + col) % 2 == 0 ? floorLightColor : floorDarkColor;
+			Quad(triangleManager, glm::vec3(cellWidth, 1.0f, cellDepth), glm::vec3(roomMin.x + (col + 0.5f) * cellWidth, roomMin.y, roomMin.z + (row + 0.5f) * cellDepth), noRotation, cellColor);
+		}
+	}
+
+	Quad(triangleManager, glm::vec3(roomSize.x, 1.0f, roomSize.z), glm::vec3(roomCenter.x, roomMax.y, roomCenter.z), glm::vec3(180.0f, 0.0f, 0.0f), whiteColor);
+
+	// Downward-facing emissive ceiling panel.
+	Quad(triangleManager, glm::vec3(3.5f, 1.0f, 3.5f),
+		 glm::vec3(0.0f, roomMax.y - 0.02f, -5.45f), glm::vec3(180.0f, 0.0f, 0.0f),
+		 glm::vec4(1.0f), 15.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+
+	// Foreground subject: its focal plane is 12 units in front of the camera.
+	const glm::vec4 foregroundSphereColor(1.0f, 1.0f, 1.0f, 1.0f);
+	sphereManager.AddSphere(Sphere(
+		glm::vec3(-3.7f, 3.0f, -5.0f),
+		1.05f,
+		foregroundSphereColor,
+		noEmission,
+		0.0f,
+		0.0f,
+		0.0f,
+		matteSpecularColor));
+	sphereManager.AddSphere(Sphere(
+		glm::vec3(3.7f, 3.0f, -5.0f),
+		1.05f,
+		foregroundSphereColor,
+		noEmission,
+		0.0f,
+		0.0f,
+		0.0f,
+		matteSpecularColor));
+	sphereManager.AddSphere(Sphere(
+		glm::vec3(-1.2f, 3.0f, -5.0f),
+		1.05f,
+		foregroundSphereColor,
+		noEmission,
+		0.0f,
+		0.0f,
+		0.0f,
+		matteSpecularColor));
+	sphereManager.AddSphere(Sphere(
+		glm::vec3(1.2f, 3.0f, -5.0f),
+		1.05f,
+		foregroundSphereColor,
+		noEmission,
+		0.0f,
+		0.0f,
+		0.0f,
+		matteSpecularColor));
+}
+
 
 void Scene::Scene3() {
 	SetShowEnvironment(false);

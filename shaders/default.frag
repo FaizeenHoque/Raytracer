@@ -120,6 +120,6 @@ void main() {
     vec3 pixelCol = totalIncomingLight / float(NumRaysPerPixel);
     vec3 previousCol = texture(PreviousFrame, uv).rgb;
     float weight = 1.0 / float(NumRenderedFrames + 1);
-    vec3 accumulatedCol = previousCol * (1.0 - weight) + pixelCol * weight;
+    vec3 accumulatedCol = clamp(previousCol * (1.0 - weight) + pixelCol * weight, vec3(0.0), vec3(1.0));
     FragColor = vec4(accumulatedCol, 1.0);
 }

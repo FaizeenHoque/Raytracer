@@ -12,6 +12,7 @@ public:
 
 	void Setup();
 
+	void Scene4();
 	void Scene3();
 	void Scene2();
 	void Scene1();
