@@ -57,14 +57,14 @@ int main()
     glfwSwapInterval(0);
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Shader shaderProgram("../shaders/default.vert", "../shaders/default.frag");
+    Shader shaderProgram("./shaders/default.vert", "./shaders/default.frag");
     Camera camera(shaderProgram,
                   CAMERA_FOV,
                   static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),
                   CAMERA_NEAR,
                   CAMERA_FAR,
                   FOCUS_DISTANCE,
-				  SENSITIVITY,
+                  SENSITIVITY,
                   WALK_SPEED,
                   CAMERA_YAW,
                   CAMERA_PITCH,
@@ -88,7 +88,7 @@ int main()
         if (cameraMoved)
             renderer.ResetAccumulation();
 
-    	scene.SetupParams();
+        scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
         renderer.Render(MAX_BOUNCE_COUNT, NUM_RAYS_PER_PIXEL);
 
