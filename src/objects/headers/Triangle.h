@@ -1,6 +1,8 @@
 #ifndef RAYTRACER_TRIANGLE_H
 #define RAYTRACER_TRIANGLE_H
 #include "../../headers/material.h"
+#include <cstddef>
+#include <vector>
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 #include "../../headers/shaders.h"
