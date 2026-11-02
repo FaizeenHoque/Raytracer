@@ -20,7 +20,7 @@ Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WIND
 }
 
 void Scene::Setup() {
-	Scene4();
+	Scene3();
 	triangleManager.Upload();
 	sphereManager.Upload();
 }
