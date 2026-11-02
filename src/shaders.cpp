@@ -100,6 +100,8 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
             << ") ===\n"
             << log
             << std::endl;
+        glDeleteShader(vertexShader);
+        throw std::runtime_error("Vertex shader compilation failed");
     } else {
         std::cout
             << "Vertex shader compiled OK: "
@@ -122,6 +124,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
             << ") ===\n"
             << log
             << std::endl;
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+        throw std::runtime_error("Fragment shader compilation failed");
     } else {
         std::cout
             << "Fragment shader compiled OK: "
@@ -144,6 +149,10 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
             << "=== SHADER PROGRAM LINK FAILED ===\n"
             << log
             << std::endl;
+        glDeleteProgram(ID);
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+        throw std::runtime_error("Shader program linking failed");
     } else {
         std::cout << "Shader program linked OK." << std::endl;
     }

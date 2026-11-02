@@ -66,7 +66,7 @@ vec3 Trace(Ray ray, inout uint rngState) {
 
             vec3 emittedLight = material.emissionColor * material.emissionStrength;
             incomingLight += emittedLight * rayColor;
-            rayColor *= mix(material.color, material.specularColor, isSpecularBounce);
+            rayColor *= mix(material.color, material.specularColor, float(isSpecularBounce));
 
             // The room keeps rays inside the triangle geometry, so nearly every
             // pixel otherwise performs all 50 bounces.  Russian roulette keeps
