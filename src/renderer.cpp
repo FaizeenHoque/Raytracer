@@ -83,7 +83,7 @@ void renderer::ResetAccumulation() {
     ClearAccumulationBuffers();
 }
 
-void renderer::Render(int MaxBounceCount, int NumRaysPerPixel) {
+void renderer::Render() {
     int prevIndex = 1 - currentIndex;
     static auto lastTime = std::chrono::steady_clock::now();
     static int frameCount = 0;
@@ -94,8 +94,8 @@ void renderer::Render(int MaxBounceCount, int NumRaysPerPixel) {
     shaderProgram.Activate();
 
 	// Ray Tracing
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), MaxBounceCount);
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), NumRaysPerPixel);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "MaxBounceCount"), maxBounceCount);
+    glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRaysPerPixel"), numRaysPerPixel);
 
 	// Accumulation
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "NumRenderedFrames"), numRenderedFrames);

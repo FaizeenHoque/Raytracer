@@ -21,10 +21,6 @@
 #define SENSITIVITY 0.1f
 #define WALK_SPEED 25.0f
 
-// Raytracing
-#define MAX_BOUNCE_COUNT 15
-#define NUM_RAYS_PER_PIXEL 4
-
 int main()
 {
     glfwInit();
@@ -73,6 +69,9 @@ int main()
     float DivergeStrength = 0.2f;
     float DefocusStrength = 200.0f;
 
+    int MaxBounceCount = 20;
+    int NumRaysPerPixel = 1;
+
     Shader shaderProgram("./shaders/default.vert", "./shaders/default.frag");
     Camera camera(shaderProgram,
                   CameraFOV,
@@ -91,6 +90,8 @@ int main()
 
     // Initialize renderer
     renderer renderer(shaderProgram, WINDOW_WIDTH, WINDOW_HEIGHT);
+    renderer.maxBounceCount = MaxBounceCount;
+    renderer.numRaysPerPixel = NumRaysPerPixel;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -116,6 +117,9 @@ int main()
 
         ImGui::Begin("Options");
         ImGui::Checkbox("Accumulate", &enableAccumulation);
+        ImGui::SeparatorText("Raytracing Settings");
+        bool maxBounceCountChanged = ImGui::InputInt("Max Bounce Count", &MaxBounceCount);
+        bool numRaysPerPixelChanged = ImGui::InputInt("Rays Per Pixel", &NumRaysPerPixel);
         ImGui::SeparatorText("Camera Settings");
         bool camFovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
         bool camNearChanged = ImGui::SliderFloat("Camera Near", &CameraNEAR, -100.0f, 100.0f);
@@ -138,12 +142,16 @@ int main()
         if (divergeStrengthChanged) { scene.camera.divergeStrength = DivergeStrength; }
         if (defocusStrengthChanged) { scene.camera.defocusStrength = DefocusStrength; }
 
+        if (maxBounceCountChanged) { renderer.maxBounceCount = MaxBounceCount; }
+        if (numRaysPerPixelChanged) { renderer.numRaysPerPixel = NumRaysPerPixel; }
+
         if (cameraMoved || camFovChanged || camNearChanged || camFarChanged || camPitchChanged || camYawChanged
-            || focusChanged || defocusStrengthChanged || divergeStrengthChanged) { renderer.ResetAccumulation(); }
+            || focusChanged || defocusStrengthChanged || divergeStrengthChanged
+            || maxBounceCountChanged || numRaysPerPixelChanged) { renderer.ResetAccumulation(); }
 
         scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
-        renderer.Render(MAX_BOUNCE_COUNT, NUM_RAYS_PER_PIXEL);
+        renderer.Render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

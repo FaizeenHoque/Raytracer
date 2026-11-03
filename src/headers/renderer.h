@@ -8,8 +8,11 @@ public:
 	renderer(Shader& shaderProgram, int width, int height);
 	~renderer();
 
-	void Render(int MaxBounceCount, int NumRaysPerPixel);
+	void Render();
 	void ResetAccumulation();
+
+	int maxBounceCount;
+	int numRaysPerPixel;
 
 private:
 	void CreateFullscreenQuad();
