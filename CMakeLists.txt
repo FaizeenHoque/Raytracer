@@ -55,6 +55,7 @@ endif()
 
 add_library(glad STATIC
         ${GLAD_OUT_DIR}/src/glad.c
+        src/stb/stb_image_write.h
 )
 
 target_include_directories(glad PUBLIC
@@ -98,6 +99,7 @@ add_executable(raytracer
         src/objects/Triangle.cpp
         src/objects/Cube.cpp
         src/objects/Quad.cpp
+        src/stb.cpp
 )
 
 # Include directories

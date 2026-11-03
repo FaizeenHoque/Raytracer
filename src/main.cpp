@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +13,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "stb/stb_image_write.h"
 
 // Window
 #define WINDOW_WIDTH 1280
@@ -20,6 +22,48 @@
 // Controls
 #define SENSITIVITY 0.1f
 #define WALK_SPEED 25.0f
+
+
+bool SavePNG(const std::string& filename, int width, int height)
+{
+    std::vector<unsigned char> pixels(width * height * 4);
+    std::vector<unsigned char> flipped(width * height * 4);
+
+    // Read the currently bound framebuffer
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+    glReadPixels(
+        0, 0,
+        width, height,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        pixels.data()
+    );
+
+    // OpenGL starts at the bottom-left.
+    // PNG images start at the top-left.
+    for (int y = 0; y < height; y++)
+    {
+        int src = (height - 1 - y) * width * 4;
+        int dst = y * width * 4;
+
+        std::copy_n(
+            pixels.data() + src,
+            width * 4,
+            flipped.data() + dst
+        );
+    }
+
+    return stbi_write_png(
+        filename.c_str(),
+        width,
+        height,
+        4,
+        flipped.data(),
+        width * 4
+    ) != 0;
+}
+
 
 int main()
 {
@@ -116,10 +160,10 @@ int main()
 
 
         ImGui::Begin("Options");
-        ImGui::Checkbox("Accumulate", &enableAccumulation);
         ImGui::SeparatorText("Raytracing Settings");
         bool maxBounceCountChanged = ImGui::InputInt("Max Bounce Count", &MaxBounceCount);
         bool numRaysPerPixelChanged = ImGui::InputInt("Rays Per Pixel", &NumRaysPerPixel);
+        bool accumulateChanged = ImGui::Checkbox("Accumulate", &enableAccumulation);
         ImGui::SeparatorText("Camera Settings");
         bool camFovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
         bool camNearChanged = ImGui::SliderFloat("Camera Near", &CameraNEAR, -100.0f, 100.0f);
@@ -130,6 +174,8 @@ int main()
         bool focusChanged = ImGui::InputFloat("Focus Distance", &FocusDistance);
         bool divergeStrengthChanged = ImGui::InputFloat("Diverge Strength", &DivergeStrength);
         bool defocusStrengthChanged = ImGui::InputFloat("Defocus Strength", &DefocusStrength);
+        ImGui::SeparatorText("Produce");
+        bool saveRequested = ImGui::Button("Save as .png");
         ImGui::End();
 
         if (camFovChanged) { scene.camera.fov = CameraFOV; }
@@ -147,11 +193,23 @@ int main()
 
         if (cameraMoved || camFovChanged || camNearChanged || camFarChanged || camPitchChanged || camYawChanged
             || focusChanged || defocusStrengthChanged || divergeStrengthChanged
-            || maxBounceCountChanged || numRaysPerPixelChanged) { renderer.ResetAccumulation(); }
+            || maxBounceCountChanged || numRaysPerPixelChanged || accumulateChanged) { renderer.ResetAccumulation(); }
 
         scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
         renderer.Render();
+
+        if (saveRequested)
+        {
+            if (SavePNG(
+                (std::string(std::getenv("HOME")) + "/Downloads/render.png"),
+                WINDOW_WIDTH,
+                WINDOW_HEIGHT
+            ))
+                std::cout << "Saved render.png successfully!\n";
+            else
+                std::cerr << "Failed to save PNG!\n";
+        }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
