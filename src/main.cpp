@@ -159,24 +159,56 @@ int main()
             renderer.ResetAccumulation();
 
 
-        ImGui::Begin("Options");
-        ImGui::SeparatorText("Raytracing Settings");
-        bool maxBounceCountChanged = ImGui::InputInt("Max Bounce Count", &MaxBounceCount);
-        bool numRaysPerPixelChanged = ImGui::InputInt("Rays Per Pixel", &NumRaysPerPixel);
-        bool accumulateChanged = ImGui::Checkbox("Accumulate", &enableAccumulation);
-        ImGui::SeparatorText("Camera Settings");
-        bool camFovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
-        bool camNearChanged = ImGui::SliderFloat("Camera Near", &CameraNEAR, -100.0f, 100.0f);
-        bool camFarChanged = ImGui::SliderFloat("Camera Far", &CameraFAR, -100.0f, 100.0f);
-        bool camYawChanged = ImGui::SliderFloat("Camera Yaw", &CameraYAW, -180.0f, 180.0f);
-        bool camPitchChanged = ImGui::SliderFloat("Camera Pitch", &CameraPITCH, -180.0f, 180.0f);
-        ImGui::Separator();
-        bool focusChanged = ImGui::InputFloat("Focus Distance", &FocusDistance);
-        bool divergeStrengthChanged = ImGui::InputFloat("Diverge Strength", &DivergeStrength);
-        bool defocusStrengthChanged = ImGui::InputFloat("Defocus Strength", &DefocusStrength);
-        ImGui::SeparatorText("Produce");
-        bool saveRequested = ImGui::Button("Save as .png");
-        ImGui::End();
+        bool maxBounceCountChanged = false;
+        bool numRaysPerPixelChanged = false;
+        bool accumulateChanged = false;
+        bool camFovChanged = false;
+        bool camNearChanged = false;
+        bool camFarChanged = false;
+        bool camYawChanged = false;
+        bool camPitchChanged = false;
+        bool focusChanged = false;
+        bool divergeStrengthChanged = false;
+        bool defocusStrengthChanged = false;
+        bool saveRequested = false;
+
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Options"))
+            {
+                ImGui::SeparatorText("Raytracing Settings");
+
+                maxBounceCountChanged = ImGui::InputInt("Max Bounce Count", &MaxBounceCount);
+                numRaysPerPixelChanged = ImGui::InputInt("Rays Per Pixel", &NumRaysPerPixel);
+                accumulateChanged = ImGui::Checkbox("Accumulate", &enableAccumulation);
+
+                ImGui::SeparatorText("Camera Settings");
+
+                camFovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
+                camNearChanged = ImGui::SliderFloat("Camera Near", &CameraNEAR, -100.0f, 100.0f);
+                camFarChanged = ImGui::SliderFloat("Camera Far", &CameraFAR, -100.0f, 100.0f);
+                camYawChanged = ImGui::SliderFloat("Camera Yaw", &CameraYAW, -180.0f, 180.0f);
+                camPitchChanged = ImGui::SliderFloat("Camera Pitch", &CameraPITCH, -180.0f, 180.0f);
+
+                ImGui::Separator();
+
+                focusChanged = ImGui::InputFloat("Focus Distance", &FocusDistance);
+                divergeStrengthChanged = ImGui::InputFloat("Diverge Strength", &DivergeStrength);
+                defocusStrengthChanged = ImGui::InputFloat("Defocus Strength", &DefocusStrength);
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Save as PNG"))
+                    saveRequested = true;
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMainMenuBar();
+        }
 
         if (camFovChanged) { scene.camera.fov = CameraFOV; }
         if (camNearChanged) { scene.camera.nearPlane = CameraNEAR; }
