@@ -17,17 +17,6 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-// Camera
-#define CAMERA_FOV 45.0f
-#define CAMERA_NEAR 0.01f
-#define CAMERA_FAR 1000.0f
-#define CAMERA_YAW -90.0f
-#define CAMERA_PITCH 0.0f
-
-#define FOCUS_DISTANCE 20.0f
-#define DIVERGE_STRENGTH 0.2
-#define DEFOCUS_STRENGTH 200
-
 // Controls
 #define SENSITIVITY 0.1f
 #define WALK_SPEED 25.0f
@@ -74,11 +63,15 @@ int main()
 
     bool enableAccumulation = true;
 
-    float CameraFOV = CAMERA_FOV;
-    float CameraNEAR = CAMERA_NEAR;
-    float CameraFAR = CAMERA_FAR;
-    float CameraYAW = CAMERA_YAW;
-    float CameraPITCH = CAMERA_PITCH;
+    float CameraFOV = 45.0f;
+    float CameraNEAR = 0.01f;
+    float CameraFAR = 1000.0f;
+    float CameraYAW = -90.0f;
+    float CameraPITCH = 0.0f;
+
+    float FocusDistance = 20.0f;
+    float DivergeStrength = 0.2f;
+    float DefocusStrength = 200.0f;
 
     Shader shaderProgram("./shaders/default.vert", "./shaders/default.frag");
     Camera camera(shaderProgram,
@@ -86,13 +79,13 @@ int main()
                   static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),
                   CameraNEAR,
                   CameraFAR,
-                  FOCUS_DISTANCE,
+                  FocusDistance,
                   SENSITIVITY,
                   WALK_SPEED,
                   CameraYAW,
                   CameraPITCH,
-                  static_cast<float>(DIVERGE_STRENGTH * std::pow(10, -2)),
-                  static_cast<float>(DEFOCUS_STRENGTH));
+                  static_cast<float>(DivergeStrength * std::pow(10, -2)),
+                  static_cast<float>(DefocusStrength));
     Scene scene(shaderProgram, camera, WINDOW_WIDTH, WINDOW_HEIGHT, true);
     scene.Setup();
 
@@ -129,6 +122,10 @@ int main()
         bool camFarChanged = ImGui::SliderFloat("Camera Far", &CameraFAR, -100.0f, 100.0f);
         bool camYawChanged = ImGui::SliderFloat("Camera Yaw", &CameraYAW, -180.0f, 180.0f);
         bool camPitchChanged = ImGui::SliderFloat("Camera Pitch", &CameraPITCH, -180.0f, 180.0f);
+        ImGui::Separator();
+        bool focusChanged = ImGui::InputFloat("Focus Distance", &FocusDistance);
+        bool divergeStrengthChanged = ImGui::InputFloat("Diverge Strength", &DivergeStrength);
+        bool defocusStrengthChanged = ImGui::InputFloat("Defocus Strength", &DefocusStrength);
         ImGui::End();
 
         if (camFovChanged) { scene.camera.fov = CameraFOV; }
@@ -136,7 +133,13 @@ int main()
         if (camFarChanged) { scene.camera.farPlane = CameraFAR; }
         if (camYawChanged) { scene.camera.yaw = CameraYAW; }
         if (camPitchChanged) { scene.camera.pitch = CameraPITCH; }
-        if (cameraMoved || camFovChanged || camNearChanged || camFarChanged || camPitchChanged || camYawChanged) { renderer.ResetAccumulation(); }
+
+        if (focusChanged) { scene.camera.focusDistance = FocusDistance; }
+        if (divergeStrengthChanged) { scene.camera.divergeStrength = DivergeStrength; }
+        if (defocusStrengthChanged) { scene.camera.defocusStrength = DefocusStrength; }
+
+        if (cameraMoved || camFovChanged || camNearChanged || camFarChanged || camPitchChanged || camYawChanged
+            || focusChanged || defocusStrengthChanged || divergeStrengthChanged) { renderer.ResetAccumulation(); }
 
         scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
