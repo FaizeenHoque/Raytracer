@@ -24,6 +24,8 @@ public:
 	void SetCameraYaw(float value);
 	void SetFocusDistance(float value);
 
+	bool accumulate = false;
+
 	Camera camera;
 
 private:

@@ -19,6 +19,7 @@ uniform int NumRaysPerPixel;
 // Accumulation
 uniform sampler2D PreviousFrame;
 uniform int NumRenderedFrames;
+uniform bool EnableAccumulation;
 
 // Lighting
 uniform vec3 SunLightDirection;
@@ -118,8 +119,13 @@ void main() {
     }
 
     vec3 pixelCol = totalIncomingLight / float(NumRaysPerPixel);
-    vec3 previousCol = texture(PreviousFrame, uv).rgb;
-    float weight = 1.0 / float(NumRenderedFrames + 1);
-    vec3 accumulatedCol = clamp(previousCol * (1.0 - weight) + pixelCol * weight, vec3(0.0), vec3(1.0));
-    FragColor = vec4(accumulatedCol, 1.0);
+
+    if (EnableAccumulation) {
+        vec3 previousCol = texture(PreviousFrame, uv).rgb;
+        float weight = 1.0 / float(NumRenderedFrames + 1);
+
+        pixelCol = mix(previousCol, pixelCol, weight);
+    }
+
+    FragColor = vec4(clamp(pixelCol, 0.0, 1.0), 1.0);
 }

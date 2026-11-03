@@ -66,16 +66,18 @@ int main()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
 
+    bool enableAccumulation = true;
+    float CameraFOV = CAMERA_FOV;
+
     Shader shaderProgram("./shaders/default.vert", "./shaders/default.frag");
     Camera camera(shaderProgram,
-                  CAMERA_FOV,
+                  CameraFOV,
                   static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),
                   CAMERA_NEAR,
                   CAMERA_FAR,
@@ -99,6 +101,9 @@ int main()
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        glUseProgram(shaderProgram.ID);
+        glUniform1i(glGetUniformLocation(shaderProgram.ID, "EnableAccumulation"),enableAccumulation ? 1 : 0);
+
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -110,14 +115,21 @@ int main()
         if (cameraMoved)
             renderer.ResetAccumulation();
 
+
+        ImGui::Begin("Options");
+        ImGui::Checkbox("Accumulate", &enableAccumulation);
+        bool fovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
+        ImGui::End();
+
+        if (fovChanged) { scene.camera.fov = CameraFOV; }
+        if (cameraMoved || fovChanged) { renderer.ResetAccumulation(); }
+
         scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
         renderer.Render(MAX_BOUNCE_COUNT, NUM_RAYS_PER_PIXEL);
 
-        ImGui::ShowDemoWindow();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         glfwSwapBuffers(window);
     }
 
