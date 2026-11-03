@@ -11,6 +11,7 @@
 #include "headers/renderer.h"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "stb/stb_image_write.h"
@@ -151,7 +152,55 @@ int main()
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+
         ImGui::NewFrame();
+        ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
+
+        static bool firstTime = true;
+
+        if (firstTime)
+        {
+            firstTime = false;
+
+            ImGui::DockBuilderRemoveNode(dockspaceID);
+
+            ImGui::DockBuilderAddNode(
+                dockspaceID,
+                ImGuiDockNodeFlags_DockSpace
+            );
+
+            ImGui::DockBuilderSetNodeSize(
+                dockspaceID,
+                ImGui::GetMainViewport()->Size
+            );
+
+            ImGuiID center = dockspaceID;
+
+            ImGuiID left = ImGui::DockBuilderSplitNode(
+                center,
+                ImGuiDir_Left,
+                0.17f,
+                nullptr,
+                &center
+            );
+
+            ImGuiID right = ImGui::DockBuilderSplitNode(
+                center,
+                ImGuiDir_Right,
+                0.20f,
+                nullptr,
+                &center
+            );
+
+            ImGui::DockBuilderDockWindow("Hierarchy", left);
+            ImGui::DockBuilderDockWindow("Properties", right);
+            ImGui::DockBuilderDockWindow("Viewport", center);
+
+            ImGui::DockBuilderFinish(dockspaceID);
+        }
+
+        ImGui::DockSpaceOverViewport(dockspaceID, ImGui::GetMainViewport());
+
 
         bool cameraMoved = scene.camera.Look(window, deltaTime);
 
@@ -209,6 +258,15 @@ int main()
 
             ImGui::EndMainMenuBar();
         }
+
+        ImGui::Begin("Hierarchy");
+        ImGui::End();
+
+        ImGui::Begin("Properties");
+        ImGui::End();
+
+        ImGui::Begin("Viewport");
+        ImGui::End();
 
         if (camFovChanged) { scene.camera.fov = CameraFOV; }
         if (camNearChanged) { scene.camera.nearPlane = CameraNEAR; }
