@@ -73,19 +73,24 @@ int main()
     ImGui_ImplOpenGL3_Init();
 
     bool enableAccumulation = true;
+
     float CameraFOV = CAMERA_FOV;
+    float CameraNEAR = CAMERA_NEAR;
+    float CameraFAR = CAMERA_FAR;
+    float CameraYAW = CAMERA_YAW;
+    float CameraPITCH = CAMERA_PITCH;
 
     Shader shaderProgram("./shaders/default.vert", "./shaders/default.frag");
     Camera camera(shaderProgram,
                   CameraFOV,
                   static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),
-                  CAMERA_NEAR,
-                  CAMERA_FAR,
+                  CameraNEAR,
+                  CameraFAR,
                   FOCUS_DISTANCE,
                   SENSITIVITY,
                   WALK_SPEED,
-                  CAMERA_YAW,
-                  CAMERA_PITCH,
+                  CameraYAW,
+                  CameraPITCH,
                   static_cast<float>(DIVERGE_STRENGTH * std::pow(10, -2)),
                   static_cast<float>(DEFOCUS_STRENGTH));
     Scene scene(shaderProgram, camera, WINDOW_WIDTH, WINDOW_HEIGHT, true);
@@ -118,11 +123,20 @@ int main()
 
         ImGui::Begin("Options");
         ImGui::Checkbox("Accumulate", &enableAccumulation);
-        bool fovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
+        ImGui::SeparatorText("Camera Settings");
+        bool camFovChanged = ImGui::SliderFloat("Camera FOV", &CameraFOV, 10.0f, 120.0f);
+        bool camNearChanged = ImGui::SliderFloat("Camera Near", &CameraNEAR, -100.0f, 100.0f);
+        bool camFarChanged = ImGui::SliderFloat("Camera Far", &CameraFAR, -100.0f, 100.0f);
+        bool camYawChanged = ImGui::SliderFloat("Camera Yaw", &CameraYAW, -180.0f, 180.0f);
+        bool camPitchChanged = ImGui::SliderFloat("Camera Pitch", &CameraPITCH, -180.0f, 180.0f);
         ImGui::End();
 
-        if (fovChanged) { scene.camera.fov = CameraFOV; }
-        if (cameraMoved || fovChanged) { renderer.ResetAccumulation(); }
+        if (camFovChanged) { scene.camera.fov = CameraFOV; }
+        if (camNearChanged) { scene.camera.nearPlane = CameraNEAR; }
+        if (camFarChanged) { scene.camera.farPlane = CameraFAR; }
+        if (camYawChanged) { scene.camera.yaw = CameraYAW; }
+        if (camPitchChanged) { scene.camera.pitch = CameraPITCH; }
+        if (cameraMoved || camFovChanged || camNearChanged || camFarChanged || camPitchChanged || camYawChanged) { renderer.ResetAccumulation(); }
 
         scene.SetupParams();
         scene.camera.OnRenderImage(WINDOW_WIDTH, WINDOW_HEIGHT);
