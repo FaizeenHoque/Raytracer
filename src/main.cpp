@@ -17,8 +17,8 @@
 #include "stb/stb_image_write.h"
 
 // Window
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 // Controls
 #define SENSITIVITY 0.1f
@@ -72,11 +72,11 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Raytracer", NULL, NULL);
     glfwSetWindowSizeLimits(window, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glfwSetWindowSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glfwSetWindowSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     if (!window)
@@ -194,7 +194,7 @@ int main()
 
             ImGui::DockBuilderDockWindow("Hierarchy", left);
             ImGui::DockBuilderDockWindow("Properties", right);
-            ImGui::DockBuilderDockWindow("Viewport", center);
+            ImGui::DockBuilderDockWindow("Render", center);
 
             ImGui::DockBuilderFinish(dockspaceID);
         }
@@ -259,15 +259,6 @@ int main()
             ImGui::EndMainMenuBar();
         }
 
-        ImGui::Begin("Hierarchy");
-        ImGui::End();
-
-        ImGui::Begin("Properties");
-        ImGui::End();
-
-        ImGui::Begin("Viewport");
-        ImGui::End();
-
         if (camFovChanged) { scene.camera.fov = CameraFOV; }
         if (camNearChanged) { scene.camera.nearPlane = CameraNEAR; }
         if (camFarChanged) { scene.camera.farPlane = CameraFAR; }
@@ -300,6 +291,28 @@ int main()
             else
                 std::cerr << "Failed to save PNG!\n";
         }
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::Begin("Render");
+
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        float aspect = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
+        ImVec2 size = avail;
+        if (avail.x / avail.y > aspect) size.x = avail.y * aspect;
+        else size.y = avail.x / aspect;
+
+        ImVec2 cursor = ImGui::GetCursorPos();
+        ImGui::SetCursorPos(ImVec2(cursor.x + (avail.x - size.x) * 0.5f, cursor.y + (avail.y - size.y) * 0.5f));
+        ImGui::Image((ImTextureID)(intptr_t)renderer.GetOutputTexture(), size, ImVec2(0, 1), ImVec2(1, 0));
+
+        ImGui::End();
+        ImGui::PopStyleVar();
+
+        ImGui::Begin("Hierarchy");
+        ImGui::End();
+
+        ImGui::Begin("Properties");
+        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

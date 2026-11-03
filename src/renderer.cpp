@@ -104,7 +104,8 @@ void renderer::Render() {
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "PreviousFrame"), 0);
 
     RenderFullscreenQuad();
-    BlitToScreen();
+    // BlitToScreen();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     numRenderedFrames++;
     currentIndex = prevIndex;

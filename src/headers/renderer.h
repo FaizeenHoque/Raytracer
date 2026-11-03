@@ -11,6 +11,9 @@ public:
 	void Render();
 	void ResetAccumulation();
 
+	GLuint GetOutputTexture() const { return accumTex[1 - currentIndex]; }
+	GLuint GetOutputFBO() const { return accumFBO[1 - currentIndex]; }
+
 	int maxBounceCount;
 	int numRaysPerPixel;
 
