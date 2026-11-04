@@ -106,7 +106,7 @@ int main()
     float CameraYAW = -90.0f;
     float CameraPITCH = 0.0f;
 
-    float FocusDistance = 0.0f;
+    float FocusDistance = 100.0f;
     float DivergeStrength = 0.2f;
     float DefocusStrength = 0.0f;
 
@@ -136,8 +136,8 @@ int main()
     bool prevRightDown = false;
     bool renderHovered = false;
 
-    int selectedSphere = -1;
-    int selectedCube = -1;
+    int selectedObject = -1;
+    float selectedType = 0;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -326,13 +326,15 @@ int main()
             auto& spheres = scene.sphereManager.spheres;
             for (int i = 0; i < (int)spheres.size(); i++) {
                 ImGui::PushID(i);
-                if (ImGui::Selectable(spheres[i].name.c_str(), selectedSphere == i)) { selectedSphere = i; selectedCube = -1; }
+                bool isSelected = (selectedType == 1 && selectedObject == i);
+                if (ImGui::Selectable(spheres[i].name.c_str(), isSelected)) { selectedObject = i; selectedType = 1; }
                 ImGui::PopID();
             }
 
             for (int i = 0; i < (int)scene.cubes.size(); i++) {
                 ImGui::PushID(1000 + i);
-                if (ImGui::Selectable(scene.cubes[i].name.c_str(), selectedCube == i)) { selectedCube = i; selectedSphere = -1; }
+                bool isSelected = (selectedType == 2 && selectedObject == i);
+                if (ImGui::Selectable(scene.cubes[i].name.c_str(), isSelected)) { selectedObject = i; selectedType = 2; }
                 ImGui::PopID();
             }
 
@@ -370,8 +372,8 @@ int main()
 
         if (ImGui::Begin("Properties")) {
             auto& spheres = scene.sphereManager.spheres;
-            if (selectedSphere >= 0 && selectedSphere < (int)spheres.size()) {
-                Sphere& sphere = spheres[selectedSphere];
+            if ((selectedObject >= 0 && selectedObject < (int)spheres.size()) and selectedType == 1) {
+                Sphere& sphere = spheres[selectedObject];
                 bool changed = false;
 
                 char nameBuffer[64];
@@ -401,8 +403,8 @@ int main()
             }
 
             auto& cubes = scene.cubes;
-            if (selectedCube >= 0 && selectedCube < (int)cubes.size()) {
-                Cube& cube = cubes[selectedCube];
+            if ((selectedObject >= 0 && selectedObject < (int)cubes.size()) and selectedType == 2) {
+                Cube& cube = cubes[selectedObject];
                 bool changed = false;
 
                 char nameBuffer[64];

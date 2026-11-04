@@ -2,11 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Quad::Quad(TriangleManager& triangle_manager, glm::vec3 scale, glm::vec3 position,
-           glm::vec3 rotation, glm::vec4 color, float emissionStrenght,
-           glm::vec3 emissionColor, float smoothness, float specularProbability,
-           glm::vec3 specularColor)
-{
+void Quad::Build(TriangleManager &triangle_manager) const {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, position);
     transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
