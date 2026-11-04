@@ -14,6 +14,7 @@
 #include "imgui_internal.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "objects/headers/Cube.h"
 #include "stb/stb_image_write.h"
 
 // Window
@@ -134,7 +135,9 @@ int main()
     bool flying = false;
     bool prevRightDown = false;
     bool renderHovered = false;
+
     int selectedSphere = -1;
+    int selectedCube = -1;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -323,7 +326,13 @@ int main()
             auto& spheres = scene.sphereManager.spheres;
             for (int i = 0; i < (int)spheres.size(); i++) {
                 ImGui::PushID(i);
-                if (ImGui::Selectable(spheres[i].name.c_str(), selectedSphere == i)) selectedSphere = i;
+                if (ImGui::Selectable(spheres[i].name.c_str(), selectedSphere == i)) { selectedSphere = i; selectedCube = -1; }
+                ImGui::PopID();
+            }
+
+            for (int i = 0; i < (int)scene.cubes.size(); i++) {
+                ImGui::PushID(1000 + i);
+                if (ImGui::Selectable(scene.cubes[i].name.c_str(), selectedCube == i)) { selectedCube = i; selectedSphere = -1; }
                 ImGui::PopID();
             }
 
@@ -333,6 +342,23 @@ int main()
                         Sphere defaultSphere("Default Sphere" ,glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
                         scene.sphereManager.AddSphere(defaultSphere);
                         scene.sphereManager.Upload();
+                        renderer.ResetAccumulation();
+                    }
+                    if (ImGui::MenuItem("Cube")) {
+                        Cube cube;
+                        cube.name = "Cube";
+                        cube.position = glm::vec3(0.0f, 0.0f, 0.0f);
+                        cube.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+                        cube.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+                        cube.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+                        cube.emissionColor = glm::vec3(1.0f, 1.0f, 1.0f);
+                        cube.specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+                        cube.emissionStrength = 0.0f;
+                        cube.specularProbability = 0.0f;
+                        cube.smoothness = 0.0f;
+
+                        scene.cubes.push_back(Cube());
+                        scene.RebuildTriangles();
                         renderer.ResetAccumulation();
                     }
                     ImGui::EndMenu();
@@ -370,6 +396,37 @@ int main()
 
                 if (changed) {
                     scene.sphereManager.Upload();
+                    renderer.ResetAccumulation();
+                }
+            }
+
+            auto& cubes = scene.cubes;
+            if (selectedCube >= 0 && selectedCube < (int)cubes.size()) {
+                Cube& cube = cubes[selectedCube];
+                bool changed = false;
+
+                char nameBuffer[64];
+                strncpy(nameBuffer, cube.name.c_str(), sizeof(nameBuffer) - 1);
+                nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+                if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) cube.name = nameBuffer;
+
+                ImGui::Separator();
+                ImGui::Text("Transform");
+                changed |= ImGui::DragFloat3("Position", &cube.position.x, 0.1f);
+                changed |= ImGui::DragFloat3("Rotation", &cube.rotation.x, 1.0f);
+                changed |= ImGui::DragFloat3("Scale", &cube.scale.x, 0.1f, 0.01f, 1000.0f);
+
+                ImGui::Separator();
+                ImGui::Text("Material");
+                changed |= ImGui::ColorEdit3("Color", &cube.color.x);
+                changed |= ImGui::ColorEdit3("Emission Color", &cube.emissionColor.x);
+                changed |= ImGui::ColorEdit3("Specular Color", &cube.specularColor.x);
+                changed |= ImGui::InputFloat("Emission Strength", &cube.emissionStrength);
+                changed |= ImGui::InputFloat("Smoothness", &cube.smoothness);
+                changed |= ImGui::InputFloat("Specular Probability", &cube.specularProbability);
+
+                if (changed) {
+                    scene.RebuildTriangles();
                     renderer.ResetAccumulation();
                 }
             }

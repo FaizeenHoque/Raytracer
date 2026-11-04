@@ -8,6 +8,8 @@
 #include "objects/headers/Sphere.h"
 #include "objects/headers/Triangle.h"
 
+class Cube;
+
 Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WINDOW_HEIGHT, bool showEnvironment)
 	: shaderProgram(shaderProgram),
 	  camera(camera),
@@ -22,6 +24,12 @@ Scene::Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WIND
 void Scene::Setup() {
 	triangleManager.Upload();
 	sphereManager.Upload();
+}
+
+void Scene::RebuildTriangles() {
+	triangleManager.Clear();
+	for (const Cube& cube : cubes) cube.Build(triangleManager);
+	triangleManager.Upload();
 }
 
 void Scene::SetupParams() {

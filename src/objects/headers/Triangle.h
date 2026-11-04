@@ -63,6 +63,7 @@ public:
 	void AddTriangle(const Triangle& triangle);
 	void Upload() const;
 
+	void Clear() { triangles.clear(); }
 	std::size_t Count();
 
 private:

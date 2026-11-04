@@ -2,6 +2,7 @@
 #define RAYTRACER_SCENE_H
 #include "camera.h"
 #include "shaders.h"
+#include "../objects/headers/Cube.h"
 #include "../objects/headers/Sphere.h"
 #include "../objects/headers/Triangle.h"
 
@@ -11,11 +12,7 @@ public:
 	Scene(Shader shaderProgram, Camera camera, float WINDOW_WIDTH, float WINDOW_HEIGHT, bool showEnvironment);
 
 	void Setup();
-
-	void Scene4();
-	void Scene3();
-	void Scene2();
-	void Scene1();
+	void RebuildTriangles();
 
 	void SetupParams();
 	void SetShowEnvironment(bool enabled);
@@ -29,6 +26,7 @@ public:
 	Camera camera;
 	SphereManager sphereManager;
 	TriangleManager triangleManager;
+	std::vector<Cube> cubes;
 
 private:
 	Shader shaderProgram;

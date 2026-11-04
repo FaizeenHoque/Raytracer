@@ -2,17 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Cube::Cube(TriangleManager& triangle_manager,
-           glm::vec3 scale,
-           glm::vec3 position,
-           glm::vec3 rotation,
-           glm::vec4 color,
-           float emissionStrenght,
-           glm::vec3 emissionColor,
-           float smoothness,
-           float specularProbability,
-           glm::vec3 specularColor)
-{
+void Cube::Build(TriangleManager &triangleManager) const {
     // Unit cube corners, centered at origin, -0.5 to 0.5 on each axis
     glm::vec3 minB(-0.5f, -0.5f, -0.5f);
     glm::vec3 maxB(0.5f, 0.5f, 0.5f);
@@ -50,50 +40,50 @@ Cube::Cube(TriangleManager& triangle_manager,
     glm::vec3 nBottom = xfNormal(n_bottom);
 
     // Front
-    triangle_manager.AddTriangle(Triangle(
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, minB.z)), xf(glm::vec3(maxB.x, minB.y, minB.z)), xf(glm::vec3(maxB.x, maxB.y, minB.z)),
-        nFront, nFront, nFront, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
-    triangle_manager.AddTriangle(Triangle(
+        nFront, nFront, nFront, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, minB.z)), xf(glm::vec3(maxB.x, maxB.y, minB.z)), xf(glm::vec3(minB.x, maxB.y, minB.z)),
-        nFront, nFront, nFront, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        nFront, nFront, nFront, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 
     // Back
-    triangle_manager.AddTriangle(Triangle(
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, maxB.z)), xf(glm::vec3(minB.x, maxB.y, maxB.z)), xf(glm::vec3(maxB.x, maxB.y, maxB.z)),
-        nBack, nBack, nBack, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
-    triangle_manager.AddTriangle(Triangle(
+        nBack, nBack, nBack, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, maxB.z)), xf(glm::vec3(maxB.x, maxB.y, maxB.z)), xf(glm::vec3(maxB.x, minB.y, maxB.z)),
-        nBack, nBack, nBack, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        nBack, nBack, nBack, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 
     // Left
-    triangle_manager.AddTriangle(Triangle(
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, minB.z)), xf(glm::vec3(minB.x, maxB.y, minB.z)), xf(glm::vec3(minB.x, maxB.y, maxB.z)),
-        nLeft, nLeft, nLeft, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
-    triangle_manager.AddTriangle(Triangle(
+        nLeft, nLeft, nLeft, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, minB.z)), xf(glm::vec3(minB.x, maxB.y, maxB.z)), xf(glm::vec3(minB.x, minB.y, maxB.z)),
-        nLeft, nLeft, nLeft, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        nLeft, nLeft, nLeft, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 
     // Right
-    triangle_manager.AddTriangle(Triangle(
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(maxB.x, minB.y, minB.z)), xf(glm::vec3(maxB.x, minB.y, maxB.z)), xf(glm::vec3(maxB.x, maxB.y, maxB.z)),
-        nRight, nRight, nRight, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
-    triangle_manager.AddTriangle(Triangle(
+        nRight, nRight, nRight, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(maxB.x, minB.y, minB.z)), xf(glm::vec3(maxB.x, maxB.y, maxB.z)), xf(glm::vec3(maxB.x, maxB.y, minB.z)),
-        nRight, nRight, nRight, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        nRight, nRight, nRight, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 
     // Top
-    triangle_manager.AddTriangle(Triangle(
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, maxB.y, minB.z)), xf(glm::vec3(maxB.x, maxB.y, minB.z)), xf(glm::vec3(maxB.x, maxB.y, maxB.z)),
-        nTop, nTop, nTop, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
-    triangle_manager.AddTriangle(Triangle(
+        nTop, nTop, nTop, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, maxB.y, minB.z)), xf(glm::vec3(maxB.x, maxB.y, maxB.z)), xf(glm::vec3(minB.x, maxB.y, maxB.z)),
-        nTop, nTop, nTop, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        nTop, nTop, nTop, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 
     // Bottom
-    triangle_manager.AddTriangle(Triangle(
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, minB.z)), xf(glm::vec3(maxB.x, minB.y, maxB.z)), xf(glm::vec3(maxB.x, minB.y, minB.z)),
-        nBottom, nBottom, nBottom, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
-    triangle_manager.AddTriangle(Triangle(
+        nBottom, nBottom, nBottom, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
+    triangleManager.AddTriangle(Triangle(
         xf(glm::vec3(minB.x, minB.y, minB.z)), xf(glm::vec3(minB.x, minB.y, maxB.z)), xf(glm::vec3(maxB.x, minB.y, maxB.z)),
-        nBottom, nBottom, nBottom, color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        nBottom, nBottom, nBottom, color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 }
