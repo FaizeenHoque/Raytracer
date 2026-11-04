@@ -324,11 +324,18 @@ int main()
         ImGui::PopStyleVar();
 
         if (ImGui::Begin("Hierarchy")) {
+            int deleteIndex = -1;
+            int deleteType = 0;
+
             auto& spheres = scene.sphereManager.spheres;
             for (int i = 0; i < (int)spheres.size(); i++) {
                 ImGui::PushID(i);
                 bool isSelected = (selectedType == 1 && selectedObject == i);
                 if (ImGui::Selectable(spheres[i].name.c_str(), isSelected)) { selectedObject = i; selectedType = 1; }
+                if (ImGui::BeginPopupContextItem()) {
+                    if (ImGui::MenuItem("Delete")) { deleteIndex = i; deleteType = 1; }
+                    ImGui::EndPopup();
+                }
                 ImGui::PopID();
             }
 
@@ -336,6 +343,10 @@ int main()
                 ImGui::PushID(1000 + i);
                 bool isSelected = (selectedType == 2 && selectedObject == i);
                 if (ImGui::Selectable(scene.cubes[i].name.c_str(), isSelected)) { selectedObject = i; selectedType = 2; }
+                if (ImGui::BeginPopupContextItem()) {
+                    if (ImGui::MenuItem("Delete")) { deleteIndex = i; deleteType = 2; }
+                    ImGui::EndPopup();
+                }
                 ImGui::PopID();
             }
 
@@ -343,10 +354,36 @@ int main()
                 ImGui::PushID(2000 + i);
                 bool isSelected = (selectedType == 3 && selectedObject == i);
                 if (ImGui::Selectable(scene.quads[i].name.c_str(), isSelected)) { selectedObject = i; selectedType = 3; }
+                if (ImGui::BeginPopupContextItem()) {
+                    if (ImGui::MenuItem("Delete")) { deleteIndex = i; deleteType = 3; }
+                    ImGui::EndPopup();
+                }
                 ImGui::PopID();
             }
 
-            if (ImGui::BeginPopupContextWindow("More", ImGuiPopupFlags_MouseButtonRight)) {
+
+            if (deleteIndex >= 0) {
+                if (deleteType == 1) {
+                    spheres.erase(spheres.begin() + deleteIndex);
+                    scene.sphereManager.Upload();
+                } else if (deleteType == 2) {
+                    scene.cubes.erase(scene.cubes.begin() + deleteIndex);
+                    scene.RebuildTriangles();
+                } else if (deleteType == 3) {
+                    scene.quads.erase(scene.quads.begin() + deleteIndex);
+                    scene.RebuildTriangles();
+                }
+
+                if (selectedType == deleteType) {
+                    if (selectedObject == deleteIndex) { selectedObject = -1; selectedType = 0; }
+                    else if (selectedObject > deleteIndex) selectedObject--;
+                }
+
+                renderer.ResetAccumulation();
+            }
+
+
+            if (ImGui::BeginPopupContextWindow("More", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
                 if (ImGui::BeginMenu("Create Object")) {
                     if (ImGui::MenuItem("Quad")) {
                         Quad quad;
