@@ -33,12 +33,15 @@ HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius, RayTracingMate
 }
 
 HitInfo RayTriangle(Ray ray, Triangle tri, RayTracingMaterial material) {
+//    vec3 surfaceNormal = normalize(tri.normalA);
+//    if (dot(ray.dir, surfaceNormal) >= 0.0) {
+//        HitInfo hitInfo;
+//        hitInfo.didHit = false;
+//        return hitInfo;
+//    }
+
     vec3 surfaceNormal = normalize(tri.normalA);
-    if (dot(ray.dir, surfaceNormal) >= 0.0) {
-        HitInfo hitInfo;
-        hitInfo.didHit = false;
-        return hitInfo;
-    }
+    if (dot(ray.dir, surfaceNormal) > 0.0) surfaceNormal = -surfaceNormal;
 
     vec3 edgeAB = tri.posB - tri.posA;
     vec3 edgeAC = tri.posC - tri.posA;
