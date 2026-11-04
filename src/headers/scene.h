@@ -27,11 +27,11 @@ public:
 	bool accumulate = false;
 
 	Camera camera;
+	SphereManager sphereManager;
+	TriangleManager triangleManager;
 
 private:
 	Shader shaderProgram;
-	SphereManager sphereManager;
-	TriangleManager triangleManager;
 	bool showEnvironment;
 	float WINDOW_WIDTH;
 	float WINDOW_HEIGHT;

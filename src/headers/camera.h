@@ -18,8 +18,8 @@ public:
 	float farPlane;
 	float focusDistance;
 
-	float sensitivity;
-	float walkSpeed;
+	float sensitivity = 1.0f;
+	float walkSpeed = 25.0f;
 	float yaw;
 	float pitch;
 
@@ -37,8 +37,6 @@ public:
 		float nearPlane,
 		float farPlane,
 		float focusDistance,
-		float sensitivity,
-		float walkSpeed,
 		float yaw,
 		float pitch,
 		float divergeStrength,
@@ -46,7 +44,7 @@ public:
 
 	void OnRenderImage(int width, int height);
 	void UpdateCameraParams(int width, int height);
-	bool Look(GLFWwindow* window, float deltaTime);
+	bool Look(GLFWwindow *window, float deltaTime, bool active);
 
 private:
 	Shader shaderProgram;

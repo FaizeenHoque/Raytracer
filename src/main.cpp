@@ -20,11 +20,6 @@
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
 
-// Controls
-#define SENSITIVITY 0.1f
-#define WALK_SPEED 25.0f
-
-
 bool SavePNG(const std::string& filename, int width, int height)
 {
     std::vector<unsigned char> pixels(width * height * 4);
@@ -124,8 +119,6 @@ int main()
                   CameraNEAR,
                   CameraFAR,
                   FocusDistance,
-                  SENSITIVITY,
-                  WALK_SPEED,
                   CameraYAW,
                   CameraPITCH,
                   static_cast<float>(DivergeStrength * std::pow(10, -2)),
@@ -137,6 +130,10 @@ int main()
     renderer renderer(shaderProgram, WINDOW_WIDTH, WINDOW_HEIGHT);
     renderer.maxBounceCount = MaxBounceCount;
     renderer.numRaysPerPixel = NumRaysPerPixel;
+
+    bool flying = false;
+    bool prevRightDown = false;
+    bool renderHovered = false;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -202,7 +199,19 @@ int main()
         ImGui::DockSpaceOverViewport(dockspaceID, ImGui::GetMainViewport());
 
 
-        bool cameraMoved = scene.camera.Look(window, deltaTime);
+        bool rightDown = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+
+        if (rightDown && !prevRightDown && renderHovered) {
+            flying = true;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        if (flying && !rightDown) {
+            flying = false;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+        prevRightDown = rightDown;
+
+        bool cameraMoved = scene.camera.Look(window, deltaTime, flying);
 
         if (cameraMoved)
             renderer.ResetAccumulation();
@@ -294,6 +303,7 @@ int main()
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin("Render");
+        renderHovered = ImGui::IsWindowHovered();
 
         ImVec2 avail = ImGui::GetContentRegionAvail();
         float aspect = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
@@ -308,7 +318,21 @@ int main()
         ImGui::End();
         ImGui::PopStyleVar();
 
-        ImGui::Begin("Hierarchy");
+        if (ImGui::Begin("Hierarchy")) {
+            if (ImGui::BeginPopupContextWindow("MyContextMenu", ImGuiPopupFlags_MouseButtonRight)) {
+                if (ImGui::BeginMenu("Create Object")) {
+                    if (ImGui::MenuItem("Sphere")) {
+                        glm::vec3 spawnPos = scene.camera.position - scene.camera.forward * 30.0f;
+                        Sphere defaultSphere(spawnPos, 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
+                        scene.sphereManager.AddSphere(defaultSphere);
+                        scene.sphereManager.Upload();
+                        renderer.ResetAccumulation();
+                    }
+                    ImGui::EndMenu();
+                }
+                ImGui::EndPopup();
+            }
+        }
         ImGui::End();
 
         ImGui::Begin("Properties");

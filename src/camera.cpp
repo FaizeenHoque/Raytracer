@@ -8,15 +8,12 @@ Camera::Camera(Shader shader,
                float nearPlane,
                float farPlane,
                float focusDistance,
-               float sensitivity,
-               float walkSpeed,
                float yaw,
                float pitch,
                float divergeStrength,
                float defocusStrength)
     : shaderProgram(shader), fov(fov), aspect(aspect),
-      nearPlane(nearPlane), farPlane(farPlane), focusDistance(focusDistance), sensitivity(sensitivity),
-      walkSpeed(walkSpeed), yaw(yaw), pitch(pitch),
+      nearPlane(nearPlane), farPlane(farPlane), focusDistance(focusDistance), yaw(yaw), pitch(pitch),
       divergeStrength(divergeStrength), defocusStrength(defocusStrength)
 {
     shaderProgram.Activate();
@@ -52,86 +49,67 @@ void Camera::UpdateCameraParams(int width, int height)
     glUniform1f(glGetUniformLocation(shaderProgram.ID, "DefocusStrength"), defocusStrength);
 }
 
-bool Camera::Look(GLFWwindow *window, float deltaTime)
-{
-    float walkSpeed_ = walkSpeed * deltaTime;
+bool Camera::Look(GLFWwindow *window, float deltaTime, bool active) {
+	float walkSpeed_ = walkSpeed * deltaTime;
 
-    glm::vec3 oldPosition = position;
-    float oldYaw = yaw;
-    float oldPitch = pitch;
+	glm::vec3 oldPosition = position;
+	float oldYaw = yaw;
+	float oldPitch = pitch;
 
-    static double lastMouseX = 0.0;
-    static double lastMouseY = 0.0;
-    static bool firstMouse = true;
+	static double lastMouseX = 0.0;
+	static double lastMouseY = 0.0;
+	static bool wasActive = false;
 
-    double mouseX, mouseY;
-    glfwGetCursorPos(window, &mouseX, &mouseY);
+	if (active) {
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
 
-    if (firstMouse)
-    {
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        firstMouse = false;
-    }
+		if (!wasActive) {
+			lastMouseX = mouseX;
+			lastMouseY = mouseY;
+		}
 
-    float xOffset = mouseX - lastMouseX;
-    float yOffset = lastMouseY - mouseY;
+		float xOffset = mouseX - lastMouseX;
+		float yOffset = lastMouseY - mouseY;
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
 
-    lastMouseX = mouseX;
-    lastMouseY = mouseY;
+		yaw -= xOffset * sensitivity;
+		pitch -= yOffset * sensitivity;
+	}
+	wasActive = active;
 
-    yaw -= xOffset * sensitivity;
-    pitch -= yOffset * sensitivity;
+	pitch = glm::clamp(pitch, -89.0f, 89.0f);
 
-    pitch = glm::clamp(pitch, -89.0f, 89.0f);
+	glm::vec3 newForward;
+	newForward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	newForward.y = sin(glm::radians(pitch));
+	newForward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	forward = glm::normalize(newForward);
 
-    glm::vec3 newForward;
+	glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
+	right = glm::normalize(glm::cross(forward, worldUp));
+	up = glm::normalize(glm::cross(right, forward));
 
-    newForward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    newForward.y = sin(glm::radians(pitch));
-    newForward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	if (active) {
+		glm::vec3 flatForward = glm::normalize(glm::vec3(forward.x, 0.0f, forward.z));
 
-    forward = glm::normalize(newForward);
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) position -= flatForward * walkSpeed_;
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) position += flatForward * walkSpeed_;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) position -= right * walkSpeed_;
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) position += right * walkSpeed_;
 
-    glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) position.y += walkSpeed_;
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) position.y -= walkSpeed_;
 
-    right = glm::normalize(glm::cross(forward, worldUp));
-    up = glm::normalize(glm::cross(right, forward));
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+			position = glm::vec3(0.0f, 0.0f, -5.0f);
+			yaw = -90.0f;
+			pitch = 0.0f;
+		}
+	}
 
-    glm::vec3 flatForward = glm::normalize(
-        glm::vec3(forward.x, 0.0f, forward.z));
+	view = glm::lookAt(position, position + forward, worldUp);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        position -= flatForward * walkSpeed_;
-
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        position += flatForward * walkSpeed_;
-
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        position -= right * walkSpeed_;
-
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        position += right * walkSpeed_;
-
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        position.y += walkSpeed_;
-
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        position.y -= walkSpeed_;
-
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-    {
-        position = glm::vec3(0.0f, 0.0f, -5.0f);
-        yaw = -90.0f;
-        pitch = 0.0f;
-    }
-
-    view = glm::lookAt(
-        position,
-        position + forward,
-        worldUp);
-
-    return position != oldPosition ||
-           yaw != oldYaw ||
-           pitch != oldPitch;
+	return position != oldPosition || yaw != oldYaw || pitch != oldPitch;
 }
