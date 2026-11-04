@@ -342,7 +342,38 @@ int main()
         }
         ImGui::End();
 
-        ImGui::Begin("Properties");
+        if (ImGui::Begin("Properties")) {
+            auto& spheres = scene.sphereManager.spheres;
+            if (selectedSphere >= 0 && selectedSphere < (int)spheres.size()) {
+                Sphere& sphere = spheres[selectedSphere];
+                bool changed = false;
+
+                char nameBuffer[64];
+                strncpy(nameBuffer, sphere.name.c_str(), sizeof(nameBuffer) - 1);
+                nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+                if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) sphere.name = nameBuffer;
+
+                ImGui::Separator();
+                ImGui::Text("Transform");
+                changed |= ImGui::DragFloat3("Position", &sphere.position.x, 0.1f);
+                changed |= ImGui::DragFloat("Radius", &sphere.radius, 0.1f, 0.01f, 1000.0f);
+
+                ImGui::Separator();
+                ImGui::Text("Material");
+                changed |= ImGui::ColorEdit3("Color", &sphere.color.x);
+                changed |= ImGui::ColorEdit3("Emission Color", &sphere.emissionColor.x);
+                changed |= ImGui::ColorEdit3("Specular Color", &sphere.specularColor.x);
+                ImGui::Separator();
+                changed |= ImGui::InputFloat("Emission Strength", &sphere.emissionStrength);
+                changed |= ImGui::InputFloat("Smoothness", &sphere.smoothness);
+                changed |= ImGui::InputFloat("Specular Probability", &sphere.specularProbability);
+
+                if (changed) {
+                    scene.sphereManager.Upload();
+                    renderer.ResetAccumulation();
+                }
+            }
+        }
         ImGui::End();
 
         ImGui::Render();
