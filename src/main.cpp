@@ -106,9 +106,9 @@ int main()
     float CameraYAW = -90.0f;
     float CameraPITCH = 0.0f;
 
-    float FocusDistance = 20.0f;
+    float FocusDistance = 0.0f;
     float DivergeStrength = 0.2f;
-    float DefocusStrength = 200.0f;
+    float DefocusStrength = 0.0f;
 
     int MaxBounceCount = 20;
     int NumRaysPerPixel = 1;
