@@ -15,6 +15,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "objects/headers/Cube.h"
+#include "objects/headers/Quad.h"
 #include "stb/stb_image_write.h"
 
 // Window
@@ -338,12 +339,29 @@ int main()
                 ImGui::PopID();
             }
 
+            for (int i = 0; i < (int)scene.quads.size(); i++) {
+                ImGui::PushID(2000 + i);
+                bool isSelected = (selectedType == 3 && selectedObject == i);
+                if (ImGui::Selectable(scene.quads[i].name.c_str(), isSelected)) { selectedObject = i; selectedType = 3; }
+                ImGui::PopID();
+            }
+
             if (ImGui::BeginPopupContextWindow("More", ImGuiPopupFlags_MouseButtonRight)) {
                 if (ImGui::BeginMenu("Create Object")) {
-                    if (ImGui::MenuItem("Sphere")) {
-                        Sphere defaultSphere("Default Sphere" ,glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
-                        scene.sphereManager.AddSphere(defaultSphere);
-                        scene.sphereManager.Upload();
+                    if (ImGui::MenuItem("Quad")) {
+                        Quad quad;
+                        quad.position = glm::vec3(0.0f, 0.0f, 0.0f);
+                        quad.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+                        quad.scale = glm::vec3(20.0f, 3.0f, 20.0f);
+                        quad.color = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
+                        quad.emissionColor = glm::vec3(1.0f, 1.0f, 1.0f);
+                        quad.specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+                        quad.emissionStrength = 0.0f;
+                        quad.specularProbability = 0.0f;
+                        quad.smoothness = 0.0f;
+
+                        scene.quads.push_back(quad);
+                        scene.RebuildTriangles();
                         renderer.ResetAccumulation();
                     }
                     if (ImGui::MenuItem("Cube")) {
@@ -359,8 +377,14 @@ int main()
                         cube.specularProbability = 0.0f;
                         cube.smoothness = 0.0f;
 
-                        scene.cubes.push_back(Cube());
+                        scene.cubes.push_back(cube);
                         scene.RebuildTriangles();
+                        renderer.ResetAccumulation();
+                    }
+                    if (ImGui::MenuItem("Sphere")) {
+                        Sphere defaultSphere("Default Sphere" ,glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
+                        scene.sphereManager.AddSphere(defaultSphere);
+                        scene.sphereManager.Upload();
                         renderer.ResetAccumulation();
                     }
                     ImGui::EndMenu();
@@ -426,6 +450,37 @@ int main()
                 changed |= ImGui::InputFloat("Emission Strength", &cube.emissionStrength);
                 changed |= ImGui::InputFloat("Smoothness", &cube.smoothness);
                 changed |= ImGui::InputFloat("Specular Probability", &cube.specularProbability);
+
+                if (changed) {
+                    scene.RebuildTriangles();
+                    renderer.ResetAccumulation();
+                }
+            }
+
+            auto& quads = scene.quads;
+            if ((selectedObject >= 0 && selectedObject < (int)quads.size()) and selectedType == 3) {
+                Quad& quad = quads[selectedObject];
+                bool changed = false;
+
+                char nameBuffer[64];
+                strncpy(nameBuffer, quad.name.c_str(), sizeof(nameBuffer) - 1);
+                nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+                if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) quad.name = nameBuffer;
+
+                ImGui::Separator();
+                ImGui::Text("Transform");
+                changed |= ImGui::DragFloat3("Position", &quad.position.x, 0.1f);
+                changed |= ImGui::DragFloat3("Rotation", &quad.rotation.x, 1.0f);
+                changed |= ImGui::DragFloat3("Scale", &quad.scale.x, 0.1f, 0.01f, 1000.0f);
+
+                ImGui::Separator();
+                ImGui::Text("Material");
+                changed |= ImGui::ColorEdit3("Color", &quad.color.x);
+                changed |= ImGui::ColorEdit3("Emission Color", &quad.emissionColor.x);
+                changed |= ImGui::ColorEdit3("Specular Color", &quad.specularColor.x);
+                changed |= ImGui::InputFloat("Emission Strength", &quad.emissionStrength);
+                changed |= ImGui::InputFloat("Smoothness", &quad.smoothness);
+                changed |= ImGui::InputFloat("Specular Probability", &quad.specularProbability);
 
                 if (changed) {
                     scene.RebuildTriangles();

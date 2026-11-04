@@ -21,8 +21,8 @@ void Quad::Build(TriangleManager &triangle_manager) const {
 
     triangle_manager.AddTriangle(Triangle(
         xf(bottomLeft), xf(bottomRight), xf(topRight), normal, normal, normal,
-        color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
     triangle_manager.AddTriangle(Triangle(
         xf(bottomLeft), xf(topRight), xf(topLeft), normal, normal, normal,
-        color, emissionColor, emissionStrenght, smoothness, specularProbability, specularColor));
+        color, emissionColor, emissionStrength, smoothness, specularProbability, specularColor));
 }

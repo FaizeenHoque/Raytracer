@@ -29,6 +29,7 @@ void Scene::Setup() {
 void Scene::RebuildTriangles() {
 	triangleManager.Clear();
 	for (const Cube& cube : cubes) cube.Build(triangleManager);
+	for (const Quad& quad : quads) quad.Build(triangleManager);
 	triangleManager.Upload();
 }
 

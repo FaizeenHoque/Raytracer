@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "shaders.h"
 #include "../objects/headers/Cube.h"
+#include "../objects/headers/Quad.h"
 #include "../objects/headers/Sphere.h"
 #include "../objects/headers/Triangle.h"
 
@@ -26,7 +27,9 @@ public:
 	Camera camera;
 	SphereManager sphereManager;
 	TriangleManager triangleManager;
+
 	std::vector<Cube> cubes;
+	std::vector<Quad> quads;
 
 private:
 	Shader shaderProgram;
