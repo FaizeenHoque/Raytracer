@@ -3,6 +3,7 @@
 #include <iostream>
 
 Sphere::Sphere(
+	std::string name,
 	const glm::vec3& position,
 	float radius,
 	const glm::vec4& color,
@@ -12,7 +13,8 @@ Sphere::Sphere(
 	float specularProbability,
 	const glm::vec3& specularColor
 )
-	: position(position),
+	: name(name),
+	  position(position),
 	  radius(radius),
 	  color(color),
 	  emissionColor(emissionColor),

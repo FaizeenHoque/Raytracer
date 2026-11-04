@@ -323,15 +323,14 @@ int main()
             auto& spheres = scene.sphereManager.spheres;
             for (int i = 0; i < (int)spheres.size(); i++) {
                 ImGui::PushID(i);
-                std::string label = "Sphere " + std::to_string(i);
-                if (ImGui::Selectable(label.c_str(), selectedSphere == i)) selectedSphere = i;
+                if (ImGui::Selectable(spheres[i].name.c_str(), selectedSphere == i)) selectedSphere = i;
                 ImGui::PopID();
             }
 
             if (ImGui::BeginPopupContextWindow("More", ImGuiPopupFlags_MouseButtonRight)) {
                 if (ImGui::BeginMenu("Create Object")) {
                     if (ImGui::MenuItem("Sphere")) {
-                        Sphere defaultSphere(glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
+                        Sphere defaultSphere("Default Sphere" ,glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
                         scene.sphereManager.AddSphere(defaultSphere);
                         scene.sphereManager.Upload();
                         renderer.ResetAccumulation();

@@ -19,6 +19,7 @@ static_assert(offsetof(SphereGPU, material) == 16);
 
 class Sphere {
 public:
+	std::string name;
 	glm::vec3 position;
 	float radius;
 	glm::vec4 color;
@@ -29,6 +30,7 @@ public:
 	float specularProbability;
 
 	Sphere(
+		std::string name,
 		const glm::vec3& position,
 		float radius,
 		const glm::vec4& color,
