@@ -49,11 +49,10 @@ public:
 	void Upload() const;
 
 	std::size_t Count();
+	std::vector<Sphere> spheres;
 
 private:
 	void BindToShader(Shader& shader);
-
-	std::vector<Sphere> spheres;
 
 	GLuint sphereUBO = 0;
 

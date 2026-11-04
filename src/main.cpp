@@ -134,6 +134,7 @@ int main()
     bool flying = false;
     bool prevRightDown = false;
     bool renderHovered = false;
+    int selectedSphere = -1;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -319,7 +320,15 @@ int main()
         ImGui::PopStyleVar();
 
         if (ImGui::Begin("Hierarchy")) {
-            if (ImGui::BeginPopupContextWindow("MyContextMenu", ImGuiPopupFlags_MouseButtonRight)) {
+            auto& spheres = scene.sphereManager.spheres;
+            for (int i = 0; i < (int)spheres.size(); i++) {
+                ImGui::PushID(i);
+                std::string label = "Sphere " + std::to_string(i);
+                if (ImGui::Selectable(label.c_str(), selectedSphere == i)) selectedSphere = i;
+                ImGui::PopID();
+            }
+
+            if (ImGui::BeginPopupContextWindow("More", ImGuiPopupFlags_MouseButtonRight)) {
                 if (ImGui::BeginMenu("Create Object")) {
                     if (ImGui::MenuItem("Sphere")) {
                         Sphere defaultSphere(glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
