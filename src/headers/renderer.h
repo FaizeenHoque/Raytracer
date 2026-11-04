@@ -17,6 +17,18 @@ public:
 	int maxBounceCount;
 	int numRaysPerPixel;
 
+	// Snapshotting / Previews
+	GLuint snapshotTex = 0;
+	GLuint snapshotFBO = 0;
+	GLuint readFBO = 0;
+
+	bool hasSnapshot = false;
+	int numRenderedFrames;
+
+	void CreateSnapshotBuffers();
+	void CaptureSnapshot();
+	GLuint GetSnapshotTexture() const { return snapshotTex; }
+
 private:
 	void CreateFullscreenQuad();
 	void CreateAccumulationBuffers();
@@ -36,7 +48,6 @@ private:
 	GLuint accumTex[2];
 
 	int currentIndex;
-	int numRenderedFrames;
 };
 
 #endif //RAYTRACER_RENDERER_H

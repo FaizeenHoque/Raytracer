@@ -14,6 +14,7 @@ renderer::renderer(Shader& shaderProgram, int width, int height)
       numRenderedFrames(0) {
     CreateFullscreenQuad();
     CreateAccumulationBuffers();
+    CreateSnapshotBuffers();
 }
 
 renderer::~renderer() {
@@ -120,6 +121,37 @@ void renderer::Render() {
         frameCount = 0;
         lastTime = now;
     }
+}
+
+void renderer::CreateSnapshotBuffers() {
+    glGenTextures(1, &snapshotTex);
+    glBindTexture(GL_TEXTURE_2D, snapshotTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glGenFramebuffers(1, &snapshotFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, snapshotFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, snapshotTex, 0);
+
+    glGenFramebuffers(1, &readFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void renderer::CaptureSnapshot() {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, readFBO);
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOutputTexture(), 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, snapshotFBO);
+
+    std::cout << "read FBO: " << std::hex << glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)
+              << " draw FBO: " << glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) << std::dec << "\n";
+    std::cout << "snapshotTex: " << snapshotTex << " snapshotFBO: " << snapshotFBO << " readFBO: " << readFBO << "\n";
+
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    std::cout << "glGetError after blit: " << glGetError() << "\n";
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    hasSnapshot = true;
 }
 
 void renderer::RenderFullscreenQuad() {
