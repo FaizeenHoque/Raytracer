@@ -322,8 +322,7 @@ int main()
             if (ImGui::BeginPopupContextWindow("MyContextMenu", ImGuiPopupFlags_MouseButtonRight)) {
                 if (ImGui::BeginMenu("Create Object")) {
                     if (ImGui::MenuItem("Sphere")) {
-                        glm::vec3 spawnPos = scene.camera.position - scene.camera.forward * 30.0f;
-                        Sphere defaultSphere(spawnPos, 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
+                        Sphere defaultSphere(glm::vec3(0.0f), 5.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f), glm::vec3(0.0f), 0.0f, 0.0f, 0.0f, glm::vec3(0.0f));
                         scene.sphereManager.AddSphere(defaultSphere);
                         scene.sphereManager.Upload();
                         renderer.ResetAccumulation();
