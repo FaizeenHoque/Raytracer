@@ -1,0 +1,122 @@
+name: Create release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (for example, 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build Linux release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends \
+            build-essential \
+            libgl1-mesa-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install GLAD generator
+        run: python -m pip install glad
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package
+        run: |
+          package_dir="raytracer-${{ inputs.version }}-linux"
+          mkdir "$package_dir"
+          cp build/raytracer "$package_dir/"
+          cp -r build/shaders "$package_dir/"
+          tar -czf "$package_dir.tar.gz" "$package_dir"
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: raytracer-linux
+          path: raytracer-${{ inputs.version }}-linux.tar.gz
+          if-no-files-found: error
+
+  build-windows:
+    name: Build Windows release
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install GLAD generator
+        run: python -m pip install glad
+
+      - name: Configure
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $packageDir = "raytracer-${{ inputs.version }}-windows"
+          New-Item -ItemType Directory -Path $packageDir | Out-Null
+          Copy-Item build/Release/raytracer.exe $packageDir/
+          Copy-Item -Recurse build/Release/shaders $packageDir/
+          Compress-Archive -Path $packageDir -DestinationPath "$packageDir.zip"
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: raytracer-windows
+          path: raytracer-${{ inputs.version }}-windows.zip
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub release
+    needs:
+      - build-linux
+      - build-windows
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: ${{ inputs.version }}
+          generate_release_notes: true
+          files: release-assets/*
