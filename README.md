@@ -1,6 +1,6 @@
 # Raytracer
 
-This is a small GPU raytracer written as a learning project. It renders a scene in real time and slowly cleans up the image while it stays still.
+Raytracer is a small GPU path tracer and scene editor written as a learning project. It renders the scene in real time, progressively reduces noise while the camera is still, and provides an ImGui editor for building and adjusting scenes.
 
 ## What is raytracing?
 
@@ -14,20 +14,30 @@ The shader uses random samples to make the lighting look less artificial. A sing
 
 ## How this raytracer works
 
-The application draws a full-screen quad with OpenGL. The fragment shader does the raytracing work on the GPU. Spheres and triangles are uploaded to the shader through uniform buffers, and quads are built from triangles. The current scene uses emissive geometry for indoor lighting and can also use a procedural sky and sun.
+The application draws a full-screen quad with OpenGL. The fragment shader does the path tracing work on the GPU. Spheres and triangles are uploaded to the shader through uniform buffers, while cubes and quads are converted into triangles. The default scene uses a procedural sky, ground, and sun; emissive materials can also be used as light sources.
 
-The default scene is selected in `Scene::Setup()` inside `src/scene.cpp`. It is a small room with coloured walls, a checkerboard floor, an area light, and reflective spheres. The project also contains other scene functions that can be enabled from the same file.
+The scene starts empty and can be edited directly in the application. The editor has a Scene preview, a Hierarchy for selecting and deleting objects, and a Properties panel for editing transforms and materials.
+
+## Editor features
+
+- Create spheres, cubes, and quads from the Hierarchy context menu.
+- Edit object names, transforms, colours, emission, smoothness, and specular probability.
+- Adjust raytracing settings such as maximum bounces, rays per pixel, and accumulation.
+- Adjust camera field of view, clipping planes, orientation, focus distance, divergence, and defocus.
+- Render a fixed number of samples, cancel a render, and capture the current result as a PNG.
+- Save and open project files. Projects are written to `~/Downloads/project.json`; captured images are written to `~/Downloads`.
 
 ## What this raytracer is written with
 
-The program is written in C++17. OpenGL 3.3 is used to display the result and run the GLSL shaders. GLFW creates the window and handles input, GLAD loads OpenGL functions, and GLM provides vector and matrix math. GLFW, GLAD, and GLM are included in the `libraries` directory.
+The program is written in C++17. OpenGL 3.3 is used to display the result and run the GLSL shaders. GLFW creates the window and handles input, Dear ImGui provides the editor UI, GLAD loads OpenGL functions, and GLM provides vector and matrix math. GLFW and GLM are fetched by CMake; Dear ImGui and the project sources are included in the repository.
 
 ## How to install
 
-You need CMake 3.20 or newer, a C++17 compiler, and the development files for OpenGL and X11 on Linux. On Debian or Ubuntu, install the required system packages with:
+You need CMake 3.20 or newer, a C++17 compiler, Python 3 with the `glad` package, and the development files for OpenGL and X11 on Linux. On Debian or Ubuntu, install the required system packages with:
 
 ```bash
-sudo apt install build-essential cmake libgl1-mesa-dev xorg-dev
+sudo apt install build-essential cmake python3 python3-pip libgl1-mesa-dev xorg-dev
+python3 -m pip install glad
 ```
 
 Then configure and build the project from its root directory:
@@ -46,24 +56,22 @@ cd build
 ./raytracer
 ```
 
-Use the mouse to look around. Use `W`, `A`, `S`, and `D` to move, `Space` to move up, and left `Ctrl` to move down. Press `R` to reset the camera. Some scenes disable movement and mouse input on purpose.
+To fly the camera, hold the right mouse button over the Scene panel. Move with `W`, `A`, `S`, and `D`; use `E` or `Space` to move up and `Q` or left `Ctrl` to move down. Press `R` to reset the camera. Camera movement resets the accumulation buffer.
 
-## How to set up a scene
+## Editing and rendering
 
-Open `src/scene.cpp` and edit the scene function called by `Scene::Setup()`. Add spheres through `sphereManager.AddSphere(...)`. Add triangles through `triangleManager`, or use `Quad(...)` when you want a simple rectangular surface. Each object accepts a colour, emission settings, smoothness, specular probability, and specular colour.
+Right-click an empty area of the Hierarchy and choose **Create Object** to add a sphere, cube, or quad. Select an object to edit it in Properties. Changes to the scene and camera automatically reset progressive accumulation.
 
-You can also change the camera position, yaw, pitch, focus distance, and defocus strength in the selected scene. Render settings such as the maximum bounce count and rays per pixel are near the top of `src/main.cpp`. Higher values can improve the image, but they also make rendering slower.
+Use the Options menu to change raytracing and camera settings. In the Render panel, set a target sample count and click **Render** for a progressive render. Click **Capture** to save the render as a PNG. **Ctrl+S** and **Ctrl+O** save and open the project file.
+
+For code-driven scene setup, the object and scene types are in `src/objects` and `src/headers/scene.h`. The default runtime setup is in `Scene::Setup()` in `src/scene.cpp`.
 
 ## Screenshots
 
 ![Reflective Room](assets/screenshots/Reflective_Room.png)
 ![Reflective Spheres](assets/screenshots/Reflective_Spheres.png)
 ![Focus Blur](assets/screenshots/Focus_Blur.png)
-
-
-## More updates are coming
-
-This project is still growing. More scene tools, materials, lighting improvements, and general cleanup are planned for future updates.
+![Editor Preview](assets/screenshots/EditorPreview.png)
 
 ## Credits
 
