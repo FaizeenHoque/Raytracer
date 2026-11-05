@@ -56,6 +56,8 @@ endif()
 add_library(glad STATIC
         ${GLAD_OUT_DIR}/src/glad.c
         src/stb/stb_image_write.h
+        src/headers/project.h
+        src/headers/json.hpp
 )
 
 target_include_directories(glad PUBLIC

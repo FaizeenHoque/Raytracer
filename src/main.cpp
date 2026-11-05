@@ -19,6 +19,8 @@
 #include "objects/headers/Quad.h"
 #include "stb/stb_image_write.h"
 
+#include "headers/project.h"
+
 // Window
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -196,6 +198,8 @@ int main() {
 		prevRightDown = rightDown;
 
 		bool cameraMoved = scene.camera.Look(window, deltaTime, flying);
+		CameraYAW = scene.camera.yaw;
+		CameraPITCH = scene.camera.pitch;
 
 		if (cameraMoved) renderer.ResetAccumulation();
 
@@ -210,9 +214,19 @@ int main() {
 		bool focusChanged = false;
 		bool divergeStrengthChanged = false;
 		bool defocusStrengthChanged = false;
+
 		bool saveRequested = false;
+		bool saveProjectRequested = false;
+		bool loadProjectRequested = false;
 
 		if (ImGui::BeginMainMenuBar()) {
+			if (ImGui::BeginMenu("File", !rendering)) {
+				if (ImGui::MenuItem("Save Project", "Ctrl+S")) saveProjectRequested = true;
+				if (ImGui::MenuItem("Open Project", "Ctrl+O")) loadProjectRequested = true;
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("Options", !rendering)) {
 				ImGui::SeparatorText("Raytracing Settings");
 
@@ -236,8 +250,48 @@ int main() {
 
 				ImGui::EndMenu();
 			}
-
 			ImGui::EndMainMenuBar();
+		}
+
+		std::string projectPath = std::string(std::getenv("HOME")) + "/Downloads/project.json";
+
+		if (!rendering && !io.WantTextInput && io.KeyCtrl) {
+			if (ImGui::IsKeyPressed(ImGuiKey_S, false)) saveProjectRequested = true;
+			if (ImGui::IsKeyPressed(ImGuiKey_O, false)) loadProjectRequested = true;
+		}
+
+		if (saveProjectRequested) {
+			ProjectSettings settings = {CameraFOV, CameraNEAR, CameraFAR, scene.camera.yaw, scene.camera.pitch, FocusDistance, DivergeStrength, DefocusStrength, MaxBounceCount, NumRaysPerPixel, scene.camera.position};
+
+			if (SaveProject(projectPath, scene, settings)) std::cout << "Saved " << projectPath << "\n";
+			else std::cerr << "Failed to save project!\n";
+		}
+
+		if (loadProjectRequested) {
+			ProjectSettings settings;
+
+			if (LoadProject(projectPath, scene, settings)) {
+				CameraFOV = settings.cameraFOV;
+				CameraNEAR = settings.cameraNear;
+				CameraFAR = settings.cameraFar;
+				CameraYAW = settings.cameraYaw;
+				CameraPITCH = settings.cameraPitch;
+				FocusDistance = settings.focusDistance;
+				DivergeStrength = settings.divergeStrength;
+				DefocusStrength = settings.defocusStrength;
+				MaxBounceCount = settings.maxBounceCount;
+				NumRaysPerPixel = settings.numRaysPerPixel;
+				scene.camera.position = settings.cameraPosition;
+
+				camFovChanged = camNearChanged = camFarChanged = camYawChanged = camPitchChanged = true;
+				focusChanged = divergeStrengthChanged = defocusStrengthChanged = true;
+				maxBounceCountChanged = numRaysPerPixelChanged = true;
+
+				selectedObject = -1;
+				selectedType = 0;
+			} else {
+				std::cerr << "Failed to load project!\n";
+			}
 		}
 
 		if (camFovChanged) {
