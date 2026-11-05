@@ -30,7 +30,9 @@ jobs:
             libxrandr-dev \
             libxinerama-dev \
             libxcursor-dev \
-            libxi-dev
+            libxi-dev \
+            libwayland-dev \
+            wayland-protocols
 
       - name: Set up Python
         uses: actions/setup-python@v5
