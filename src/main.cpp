@@ -557,7 +557,7 @@ int main() {
 
 		if (ImGui::Begin("Properties")) {
 			auto& spheres = scene.sphereManager.spheres;
-			if ((selectedObject >= 0 && selectedObject < (int)spheres.size()) and selectedType == 1) {
+			if ((selectedObject >= 0 && selectedObject < (int)spheres.size()) && selectedType == 1) {
 				Sphere& sphere = spheres[selectedObject];
 				bool changed = false;
 
@@ -589,7 +589,7 @@ int main() {
 			}
 
 			auto& cubes = scene.cubes;
-			if ((selectedObject >= 0 && selectedObject < (int)cubes.size()) and selectedType == 2) {
+			if ((selectedObject >= 0 && selectedObject < (int)cubes.size()) && selectedType == 2) {
 				Cube& cube = cubes[selectedObject];
 				bool changed = false;
 
@@ -620,7 +620,7 @@ int main() {
 			}
 
 			auto& quads = scene.quads;
-			if ((selectedObject >= 0 && selectedObject < (int)quads.size()) and selectedType == 3) {
+			if ((selectedObject >= 0 && selectedObject < (int)quads.size()) && selectedType == 3) {
 				Quad& quad = quads[selectedObject];
 				bool changed = false;
 
