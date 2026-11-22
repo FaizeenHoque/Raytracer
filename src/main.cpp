@@ -21,9 +21,30 @@
 
 #include "headers/project.h"
 
+#include <filesystem>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 // Window
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
+
+// Directory containing the running executable (saves go here)
+std::string GetExeDir() {
+	std::error_code ec;
+#ifdef _WIN32
+	char buffer[MAX_PATH];
+	DWORD length = GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	if (length > 0 && length < MAX_PATH) return std::filesystem::path(buffer).parent_path().string();
+#else
+	std::filesystem::path exe = std::filesystem::read_symlink("/proc/self/exe", ec);
+	if (!ec) return exe.parent_path().string();
+#endif
+	return ".";
+}
 
 bool SavePNG(const std::string& filename, int width, int height, GLuint texture) {
 	std::vector<unsigned char> pixels(width * height * 4);
@@ -253,7 +274,7 @@ int main() {
 			ImGui::EndMainMenuBar();
 		}
 
-		std::string projectPath = std::string(std::getenv("HOME")) + "/Downloads/project.json";
+		std::string projectPath = GetExeDir() + "/project.json";
 
 		if (!rendering && !io.WantTextInput && io.KeyCtrl) {
 			if (ImGui::IsKeyPressed(ImGuiKey_S, false)) saveProjectRequested = true;
@@ -340,7 +361,7 @@ int main() {
 		if (saveRequested) {
 			GLuint texture = renderer.hasSnapshot ? renderer.GetSnapshotTexture() : renderer.GetOutputTexture();
 
-			if (SavePNG(std::string(std::getenv("HOME")) + "/Downloads/render.png", WINDOW_WIDTH, WINDOW_HEIGHT, texture)) std::cout << "Saved render.png successfully!\n";
+			if (SavePNG(GetExeDir() + "/render.png", WINDOW_WIDTH, WINDOW_HEIGHT, texture)) std::cout << "Saved render.png successfully!\n";
 			else std::cerr << "Failed to save PNG!\n";
 		}
 
@@ -391,7 +412,7 @@ int main() {
 
 		if (ImGui::Button("Capture") && (rendering || renderer.hasSnapshot)) {
 			GLuint texture = rendering ? renderer.GetOutputTexture() : renderer.GetSnapshotTexture();
-			std::string path = std::string(std::getenv("HOME")) + "/Downloads/render_" + std::to_string(std::time(nullptr)) + ".png";
+			std::string path = GetExeDir() + "/render_" + std::to_string(std::time(nullptr)) + ".png";
 
 			if (SavePNG(path, WINDOW_WIDTH, WINDOW_HEIGHT, texture)) std::cout << "Saved " << path << "\n";
 			else std::cerr << "Failed to save PNG!\n";
